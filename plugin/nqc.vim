@@ -4,6 +4,11 @@
 "
 "  Description:  gvim-menus for NQC (Not Quite C) ,  Version 2.3r1 .
 "                NQC is a C-like language for programmimg the LEGO MINDSTORMS RCX-Controller.
+"                The NQC language is described in:
+"
+"                    NQC Programmers's Guide, Version 2.3r1, by Dave Baum
+"                    ( http://www.enteract.com/~dbaum/ )
+"
 "                These menus turn gvim into an IDE for the RCX-programming:
 "                 - insertion of NQC statements, function calls, comments, RCX constants
 "                 - download and start programs and firmware to RCX
@@ -13,8 +18,8 @@
 "                The default style of the GNU indent programm is used for the 
 "                representation of the NQC statements.
 "
-"      Version:  1.3
-"     Revision:  21.08.2001
+"      Version:  1.3.1 / LINUX
+"     Revision:  03.09.2001
 "       Author:  Dr.-Ing. Fritz Mehner - MFH Iserlohn
 "        Email:  mehner@mfh-iserlohn.de
 "      Created:  28.07.2001 - 15:40:43
@@ -164,6 +169,7 @@ imenu RCX-Functions.sounds.PlayTone\ (freq,duration)             PlayTone(,);<Es
 imenu RCX-Functions.display.SelectDisplay\ (mode)                SelectDisplay();<Esc>F(a
 "----- messages ---------------------------------------------------------------------------
 imenu RCX-Functions.messages.ClearMessage\ (\ )                  ClearMessage();
+imenu RCX-Functions.messages.Message\ (\ )                       Message();
 imenu RCX-Functions.messages.SendMessage\ (message)              SendMessage();<Esc>F(a
 imenu RCX-Functions.messages.SetTxPower\ (power)                 SetTxPower();<Esc>F(a
 "----- general ----------------------------------------------------------------------------
@@ -256,23 +262,23 @@ imenu RCX-Constants.TX_POWER_LO                     TX_POWER_LO
 "
 "===============================================================================================
 "
-amenu  NQC-&Run.save\ and\ &compile\ \ \<Alt\>\<F9\>     <C-C>:w<CR><Esc>:!nqc %<CR>
-amenu  NQC-&Run.-SEP1-                                   :
-amenu  NQC-&Run.download\ program\ 1\ to\ RCX            <C-C>:w<CR><Esc>:!nqc -d -pgm 1 %<CR>
-amenu  NQC-&Run.download\ program\ 2\ to\ RCX            <C-C>:w<CR><Esc>:!nqc -d -pgm 2 %<CR>
-amenu  NQC-&Run.download\ program\ 3\ to\ RCX            <C-C>:w<CR><Esc>:!nqc -d -pgm 3 %<CR>
-amenu  NQC-&Run.download\ program\ 4\ to\ RCX            <C-C>:w<CR><Esc>:!nqc -d -pgm 4 %<CR>
-amenu  NQC-&Run.download\ program\ 5\ to\ RCX            <C-C>:w<CR><Esc>:!nqc -d -pgm 5 %<CR>
-amenu  NQC-&Run.-SEP2-                                   :
-amenu  NQC-&Run.download\ program\ 1\ to\ RCX\ and\ Run  <C-C>:w<CR><Esc>:!nqc -d -pgm 1 % -run<CR>
-amenu  NQC-&Run.download\ program\ 2\ to\ RCX\ and\ Run  <C-C>:w<CR><Esc>:!nqc -d -pgm 2 % -run<CR>
-amenu  NQC-&Run.download\ program\ 3\ to\ RCX\ and\ Run  <C-C>:w<CR><Esc>:!nqc -d -pgm 3 % -run<CR>
-amenu  NQC-&Run.download\ program\ 4\ to\ RCX\ and\ Run  <C-C>:w<CR><Esc>:!nqc -d -pgm 4 % -run<CR>
-amenu  NQC-&Run.download\ program\ 5\ to\ RCX\ and\ Run  <C-C>:w<CR><Esc>:!nqc -d -pgm 5 % -run<CR>
-amenu  NQC-&Run.-SEP3-                                   :
-amenu  NQC-&Run.download\ firmware\ to\ RCX              <C-C>:let @z="!nqc -firmware ".g:NQCVIM_RCX_Firmware<CR><Esc>:@z<CR>
-amenu  NQC-&Run.upload\ datalog\ from\ RCX               <C-C>:let @z="!nqc -datalog"<CR><Esc>:@z<CR>
-amenu  NQC-&Run.erase\ programs\ and\ datalogs\ in\ RCX  <C-C>:let @z="!nqc -clear"<CR><Esc>:@z<CR>
+amenu  NQC-&Run.save\ and\ &compile\ \ \<Alt\>\<F9\>       <C-C>:w<CR><Esc>:!nqc %<CR>
+amenu  NQC-&Run.-SEP1-                                     :
+amenu  NQC-&Run.download\ program\ 1\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 1 %<CR>
+amenu  NQC-&Run.download\ program\ 2\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 2 %<CR>
+amenu  NQC-&Run.download\ program\ 3\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 3 %<CR>
+amenu  NQC-&Run.download\ program\ 4\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 4 %<CR>
+amenu  NQC-&Run.download\ program\ 5\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 5 %<CR>
+amenu  NQC-&Run.-SEP2-                                     :
+amenu  NQC-&Run.download\ program\ 1\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 1 % -run<CR>
+amenu  NQC-&Run.download\ program\ 2\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 2 % -run<CR>
+amenu  NQC-&Run.download\ program\ 3\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 3 % -run<CR>
+amenu  NQC-&Run.download\ program\ 4\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 4 % -run<CR>
+amenu  NQC-&Run.download\ program\ 5\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 5 % -run<CR>
+amenu  NQC-&Run.-SEP3-                                     :
+amenu  NQC-&Run.download\ firmware\ to\ RCX                <C-C>:let @z="!nqc -firmware ".g:NQCVIM_RCX_Firmware<CR><Esc>:@z<CR>
+amenu  NQC-&Run.upload\ datalog\ into\ buffer              <C-C>:r !nqc -datalog 2>/dev/null <CR>
+amenu  NQC-&Run.erase\ programs\ and\ datalogs\ from\ RCX  <C-C>:! nqc -clear<CR>
 "
 "===============================================================================================
 "----- vim Functions ---------------------------------------------------------------------------
