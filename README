@@ -1,0 +1,12 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=67
+
+gvim-menus for NQC (Not Quite C),  Version 2.3r1  (and newer).
+NQC is a C-like language for programmimg the LEGO MINDSTORMS RCX-Controller.
+These menus turn gvim into an IDE for the RCX-programming:
+ - insertion of NQC statements, function calls, comments, RCX constants
+ - download programs and firmware to RCX
+ - upload the datalog from RCX
+ - erase programs and datalogs in RCX
+
+
+Here are some screen shots : http://lug.fh-swf.de/vim/vim-nqc/screenshots-en.html
