@@ -3,28 +3,29 @@
 "     Filename:  nqc.vim
 "
 "  Description:  gvim-menus for NQC (Not Quite C) ,  Version 2.3r1 .
-"                NQC is a C-like language for programmimg the LEGO MINDSTORMS RCX-Controller.
-"                The NQC language is described in:
 "
-"                    NQC Programmers's Guide, Version 2.3r1, by Dave Baum
-"                    ( http://www.enteract.com/~dbaum/ )
+"                NQC stands for Not Quite C, and is a simple language for programmimg
+"                several LEGO MINDSTORMS products:   RCX, CyberMaster, Scout and RCX2.
+"                The language is described in:
+"                  NQC Programmers's Guide, Version 2.3r1, by Dave Baum
+"                  ( http://www.enteract.com/~dbaum/ )
 "
-"                These menus turn gvim into an IDE for the RCX-programming:
-"                 - insertion of NQC statements, function calls, comments, RCX constants
-"                 - download and start programs and firmware to RCX
-"                 - upload the datalog from RCX
-"                 - erase programs and datalogs in RCX
+"                These menus turn gvim into an IDE for NQC programming:
 "
-"                The default style of the GNU indent programm is used for the 
-"                representation of the NQC statements.
+"                 - insertion of NQC statements, API function calls, API constants and comments
+"                 - download and start programs
+"                 - download firmware
+"                 - upload the RCX datalog into the current buffer
+"                 - erase programs and datalogs
+"                 - configurable for RCX, RCX2, CyberMaster, Scout
 "
-"      Version:  1.3.1 / LINUX
-"     Revision:  03.09.2001
-"       Author:  Dr.-Ing. Fritz Mehner - MFH Iserlohn
+"      Version:  1.4 - LINUX / UNIX
+"     Revision:  04.09.2001
+"       Author:  Dr.-Ing. Fritz Mehner 
 "        Email:  mehner@mfh-iserlohn.de
 "      Created:  28.07.2001 - 15:40:43
 "
-"        Usage:  (1) Personalize nqc.vim  (section below).
+"        Usage:  (1) Configure  nqc.vim  (section below).
 "                (2) Rename  nqc.vim  to  .nqc.vim  and put it in your home directory.  
 "                (3) Load  .nqc.vim  manually with the :so command:
 "                      :so ~/.nqc.vim
@@ -33,16 +34,24 @@
 "                The register z is used in many places.
 "
 "###############################################################################################
-"               Personalization 
+"               Configuration
 "-------------------------------------------------------------------------------------
+"
 "  Use my personalization as an example.
 "
 let NQCVIM_AuthorName      = "Fritz Mehner"
 let NQCVIM_AuthorSign      = "fm"
 "
-"  RCX-Firmware - path and filename :
+"  RCX-Firmware, full path and filename :
 "
 let NQCVIM_RCX_Firmware    = "~/bin/firm0309.lgo"
+"
+"  Supported robot type:  0 = no / 1 =yes ; multiple choices are possible 
+"
+let  NQCVIM_rcx            = 1
+let  NQCVIM_rcx_2          = 0
+let  NQCVIM_cybermaster    = 0
+let  NQCVIM_scout          = 0
 "
 "###############################################################################################
 "               Key Mappings
@@ -54,9 +63,9 @@ let NQCVIM_RCX_Firmware    = "~/bin/firm0309.lgo"
 "   F3          file open dialog
 "   Alt-F9      write buffer and compile
 "
-map	<F2>	    	:update<CR>
-map	<F3>	    	:browse confirm e<CR>
-map	<M-F9>    	:w<CR><Esc>:!nqc %<CR>
+map  <F2>        :update<CR>
+map  <F3>        :browse confirm e<CR>
+map  <M-F9>      :w<CR><Esc>:!nqc %<CR>
 "
 "###############################################################################################
 "
@@ -131,121 +140,301 @@ imenu  NQC-St&atements.#if&ndef\.\.#def\.\.#endif  <Esc>:call NQCVIM_CodeIfndef(
 imenu  NQC-St&atements.#ifdef\.\.#endif            #ifdef<Tab><CR><CR><CR>#endif<Esc>3kA
 "
 "===============================================================================================
-"----- Menu : RCX-Functions --------------------------------------------------------------------
+"----- Menu : API-Functions --------------------------------------------------------------------
 "===============================================================================================
 "
 "----- outputs ----------------------------------------------------------------------------
-imenu RCX-Functions.outputs.Float\ (outputs)                     Float();<Esc>F(a
-imenu RCX-Functions.outputs.Fwd\ (outputs)                       Fwd();<Esc>F(a
-imenu RCX-Functions.outputs.Off\ (outputs)                       Off();<Esc>F(a
-imenu RCX-Functions.outputs.On\ (outputs)                        On();<Esc>F(a
-imenu RCX-Functions.outputs.OnFor\ (outputs,time)                OnFor(,);<Esc>F(a
-imenu RCX-Functions.outputs.OnFwd\ (outputs)                     OnFwd();<Esc>F(a
-imenu RCX-Functions.outputs.OnRev\ (outputs)                     OnRev();<Esc>F(a
-imenu RCX-Functions.outputs.OutputStatus\ (n)                    OutputStatus();<Esc>F(a
-imenu RCX-Functions.outputs.Rev\ (outputs)                       Rev();<Esc>F(a
-imenu RCX-Functions.outputs.SetDirection\ (outputs,dir)          SetDirection(,);<Esc>F(a
-imenu RCX-Functions.outputs.SetOutput\ (outputs,mode)            SetOutput(,);<Esc>F(a
-imenu RCX-Functions.outputs.SetPower\ (outputs,power)            SetPower(,);<Esc>F(a
-imenu RCX-Functions.outputs.Toggle\ (outputs)                    Toggle();<Esc>F(a
-"----- sensor types, modes, information	---------------------------------------------------
-imenu RCX-Functions.sensors.ClearSensor\ (sensor)                ClearSensor();<Esc>F(a
-imenu RCX-Functions.sensors.SensorMode\ (n)                      SensorMode();<Esc>F(a
-imenu RCX-Functions.sensors.SensorType\ (n)                      SensorType();<Esc>F(a
-imenu RCX-Functions.sensors.SensorValueBool\ (n)                 SensorValueBool();<Esc>F(a
-imenu RCX-Functions.sensors.SensorValueRaw\ (n)                  SensorValueRaw();<Esc>F(a
-imenu RCX-Functions.sensors.SensorValue\ (n)                     SensorValue();<Esc>F(a
-imenu RCX-Functions.sensors.SetSensor\ (sensor,config)           SetSensor(,);<Esc>F(a
-imenu RCX-Functions.sensors.SetSensorMode\ (sensor,mode)         SetSensorMode(,);<Esc>F(a
-imenu RCX-Functions.sensors.SetSensorType\ (sensor,type)         SetSensorType(,);<Esc>F(a
+imenu API-Functions.outputs.Float\ (outputs)                     Float();<Esc>F(a
+imenu API-Functions.outputs.Fwd\ (outputs)                       Fwd();<Esc>F(a
+imenu API-Functions.outputs.Off\ (outputs)                       Off();<Esc>F(a
+imenu API-Functions.outputs.On\ (outputs)                        On();<Esc>F(a
+imenu API-Functions.outputs.OnFor\ (outputs,time)                OnFor(,);<Esc>F(a
+imenu API-Functions.outputs.OnFwd\ (outputs)                     OnFwd();<Esc>F(a
+imenu API-Functions.outputs.OnRev\ (outputs)                     OnRev();<Esc>F(a
+imenu API-Functions.outputs.OutputStatus\ (n)                    OutputStatus();<Esc>F(a
+imenu API-Functions.outputs.Rev\ (outputs)                       Rev();<Esc>F(a
+imenu API-Functions.outputs.SetDirection\ (outputs,dir)          SetDirection(,);<Esc>F(a
+imenu API-Functions.outputs.SetOutput\ (outputs,mode)            SetOutput(,);<Esc>F(a
+imenu API-Functions.outputs.SetPower\ (outputs,power)            SetPower(,);<Esc>F(a
+imenu API-Functions.outputs.Toggle\ (outputs)                    Toggle();<Esc>F(a
+"----- sensor types, modes, information ---------------------------------------------------
+imenu API-Functions.sensors.ClearSensor\ (sensor)                ClearSensor();<Esc>F(a
+if NQCVIM_rcx != 0 || NQCVIM_cybermaster != 0
+  imenu API-Functions.sensors.SensorMode\ (n)                    SensorMode();<Esc>F(a
+endif
+imenu API-Functions.sensors.SensorType\ (n)                      SensorType();<Esc>F(a
+if NQCVIM_rcx != 0
+  imenu API-Functions.sensors.SensorValueBool\ (n)               SensorValueBool();<Esc>F(a
+endif
+if NQCVIM_rcx != 0 || NQCVIM_scout != 0
+  imenu API-Functions.sensors.SensorValueRaw\ (n)                SensorValueRaw();<Esc>F(a
+endif
+imenu API-Functions.sensors.SensorValue\ (n)                     SensorValue();<Esc>F(a
+if NQCVIM_scout != 0
+  imenu API-Functions.sensors.SetSensorLowerLimit\ (value)       SetSensorLowerLimit();<Esc>F(a
+  imenu API-Functions.sensors.SetSensorUpperLimit\ (value)       SetSensorUpperLimit();<Esc>F(a
+  imenu API-Functions.sensors.SetSensorHysteresis\ (value)       SetSensorHysteresis();<Esc>F(a
+  imenu API-Functions.sensors.CalibrateSensor\ (\ )              CalibrateSensor();
+endif
+if NQCVIM_rcx != 0
+  imenu API-Functions.sensors.SetSensor\ (sensor,config)         SetSensor(,);<Esc>F(a
+endif
+if NQCVIM_rcx != 0 || NQCVIM_cybermaster != 0
+  imenu API-Functions.sensors.SetSensorMode\ (sensor,mode)       SetSensorMode(,);<Esc>F(a
+endif
+if NQCVIM_rcx != 0
+  imenu API-Functions.sensors.SetSensorType\ (sensor,type)       SetSensorType(,);<Esc>F(a
+endif
 "----- timers and counters ----------------------------------------------------------------
-imenu RCX-Functions.timers\ counters.ClearTimer\ (n)             ClearTimer();<Esc>F(a
-imenu RCX-Functions.timers\ counters.Timer\ (n)                  Timer();<Esc>F(a
-imenu RCX-Functions.timers\ counters.Counter\ (n)                Timer();<Esc>F(a
+imenu API-Functions.timers\ counters.ClearTimer\ (n)             ClearTimer();<Esc>F(a
+imenu API-Functions.timers\ counters.Timer\ (n)                  Timer();<Esc>F(a
+if NQCVIM_rcx_2 != 0
+  imenu API-Functions.timers\ counters.FastTimer\ (n)            FastTimer();<Esc>F(a
+  imenu API-Functions.timers\ counters.SetTimer\ (n,value)       SetTimer(,);<Esc>F(a
+endif
+if NQCVIM_rcx != 0 || NQCVIM_scout != 0
+  imenu API-Functions.timers\ counters.Counter\ (n)              Timer();<Esc>F(a
+endif
+if NQCVIM_rcx_2 != 0 || NQCVIM_scout != 0
+  imenu API-Functions.timers\ counters.ClearCounter\ (n)         ClearCounter();<Esc>F(a
+  imenu API-Functions.timers\ counters.DecCounter\ (n)           DecCounter();<Esc>F(a
+  imenu API-Functions.timers\ counters.IncCounter\ (n)           IncCounter();<Esc>F(a
+endif
 "----- sounds -----------------------------------------------------------------------------
-imenu RCX-Functions.sounds.PlaySound\ (sound)                    PlaySound();<Esc>F(a
-imenu RCX-Functions.sounds.PlayTone\ (freq,duration)             PlayTone(,);<Esc>F(a
+if NQCVIM_rcx_2 != 0
+  imenu API-Functions.sounds.ClearSound\ (\n)                    ClearSound();
+endif
+if NQCVIM_rcx_2 != 0 || NQCVIM_scout != 0
+  imenu API-Functions.sounds.MuteSound\ (\n)                     MuteSound();
+endif
+imenu API-Functions.sounds.PlaySound\ (sound)                    PlaySound();<Esc>F(a
+imenu API-Functions.sounds.PlayTone\ (freq,duration)             PlayTone(,);<Esc>F(a
+if NQCVIM_rcx_2 != 0 || NQCVIM_scout != 0
+  imenu API-Functions.sounds.UnmuteSound\ (\n)                   UnmuteSound();
+endif
+if NQCVIM_scout != 0
+  imenu API-Functions.sounds.SelectSound\ (group)                SelectSound();<Esc>F(a
+endif
 "----- LCD display ------------------------------------------------------------------------
-imenu RCX-Functions.display.SelectDisplay\ (mode)                SelectDisplay();<Esc>F(a
+if NQCVIM_rcx != 0
+  imenu API-Functions.display.SelectDisplay\ (mode)                  SelectDisplay();<Esc>F(a
+endif
+if NQCVIM_rcx_2 != 0
+  imenu API-Functions.display.SelectUserDisplay\ (value,precision)   SelectUserDisplay(,);<Esc>F(a
+endif
 "----- messages ---------------------------------------------------------------------------
-imenu RCX-Functions.messages.ClearMessage\ (\ )                  ClearMessage();
-imenu RCX-Functions.messages.Message\ (\ )                       Message();
-imenu RCX-Functions.messages.SendMessage\ (message)              SendMessage();<Esc>F(a
-imenu RCX-Functions.messages.SetTxPower\ (power)                 SetTxPower();<Esc>F(a
+if NQCVIM_rcx != 0 || NQCVIM_scout != 0
+  imenu API-Functions.messages.ClearMessage\ (\ )                ClearMessage();
+  imenu API-Functions.messages.Message\ (\ )                     Message();
+  imenu API-Functions.messages.SendMessage\ (message)            SendMessage();<Esc>F(a
+  imenu API-Functions.messages.SetTxPower\ (power)               SetTxPower();<Esc>F(a
+endif
 "----- general ----------------------------------------------------------------------------
-imenu RCX-Functions.general.Program\ (\ )                        Program();
-imenu RCX-Functions.general.Random\ (n)                          Random();<Esc>F(a
-imenu RCX-Functions.general.SetSleepTime\ (minutes)              SetSleepTime();<Esc>F(a
-imenu RCX-Functions.general.SetWatch\ (hours,minutes)            SetWatch(,);<Esc>F(a
-imenu RCX-Functions.general.SleepNow\ (\ )                       SleepNow();
-imenu RCX-Functions.general.StopAllTasks\ (\ )                   StopAllTasks();
-imenu RCX-Functions.general.Wait\ (time)                         Wait();<Esc>F(a
-imenu RCX-Functions.general.Watch\ (\n)                          Watch();<Esc>F(a
+imenu API-Functions.general.Random\ (n)                          Random();<Esc>F(a
+imenu API-Functions.general.SetSleepTime\ (minutes)              SetSleepTime();<Esc>F(a
+if NQCVIM_rcx_2 != 0
+  imenu API-Functions.general.SetRandomSeed\ (n)                 SetRandomSeed();<Esc>F(a
+endif
+imenu API-Functions.general.SleepNow\ (\ )                       SleepNow();
+imenu API-Functions.general.StopAllTasks\ (\ )                   StopAllTasks();
+imenu API-Functions.general.Wait\ (time)                         Wait();<Esc>F(a
+
+"----- RCX features -----------------------------------------------------------------------
+if NQCVIM_rcx != 0
+  imenu API-Functions.RCX\ features.Program\ (\ )                Program();
+  imenu API-Functions.RCX\ features.SetWatch\ (hours,minutes)    SetWatch(,);<Esc>F(a
+  imenu API-Functions.RCX\ features.Watch\ (\n)                  Watch();<Esc>F(a
+endif
+if NQCVIM_rcx_2 != 0
+  imenu API-Functions.RCX\ features.SelectProgram\ (n)           SelectProgram();<Esc>F(a
+  imenu API-Functions.RCX\ features.BatteryLevel\ (\ )           BatteryLevel();
+  imenu API-Functions.RCX\ features.FirmwareVersion\ (\ )        FirmwareVersion();
+endif
+"----- SCOUT features -----------------------------------------------------------------------
+if NQCVIM_scout != 0
+  imenu API-Functions.Scout\ features.EventFeedback\ (\ )                           EventFeedback();
+  imenu API-Functions.Scout\ features.ScoutRules\ (n)                               ScoutRules();<Esc>F(a
+  imenu API-Functions.Scout\ features.SetEventFeedback\ (events)                    SetEventFeedback();<Esc>F(a
+  imenu API-Functions.Scout\ features.SetLight\ (mode)                              SetLight();<Esc>F(a
+  imenu API-Functions.Scout\ features.SetScoutRules\ (motion,touch,light,time,fx)   SetScoutRules(,,,,);<Esc>F(a
+  imenu API-Functions.Scout\ features.SetScoutMode\ (mode)                          SetScoutMode();<Esc>F(a
+endif
+"----- CYBERMASTER features -----------------------------------------------------------------------
+if NQCVIM_cybermaster != 0
+  imenu API-Functions.cybermaster\ features.Drive\ (motor0,motor1)                  Drive(,);<Esc>F(a
+  imenu API-Functions.cybermaster\ features.OnWait\ (motors,time)                   OnWait(,);<Esc>F(a
+  imenu API-Functions.cybermaster\ features.OnWaitDifferent\ (motors,n0,n1,n2,time) OnWaitDifferent(,,,,);<Esc>F(a
+  imenu API-Functions.cybermaster\ features.ClearTachoCounter\ (motors)             ClearTachoCounter();<Esc>F(a
+  imenu API-Functions.cybermaster\ features.TachoCount\ (n)                         TachoCount();<Esc>F(a
+  imenu API-Functions.cybermaster\ features.TachoSpeed\ (n)                         TachoSpeed();<Esc>F(a
+  imenu API-Functions.cybermaster\ features.ExternalMotorRunning\ (\n)              ExternalMotorRunning();
+  imenu API-Functions.cybermaster\ features.AGC\ (\ )                               AGC();
+endif
 "----- datalog ----------------------------------------------------------------------------
-imenu RCX-Functions.datalog.AddToDatalog\ (value)                AddToDatalog();<Esc>F(a
-imenu RCX-Functions.datalog.CreateDatalog\ (size)                CreateDatalog();<Esc>F(a
-imenu RCX-Functions.datalog.UploadDatalog\ (start,count)         UploadDatalog(,);<Esc>F(a
+if NQCVIM_rcx != 0
+  imenu API-Functions.datalog.AddToDatalog\ (value)              AddToDatalog();<Esc>F(a
+  imenu API-Functions.datalog.CreateDatalog\ (size)              CreateDatalog();<Esc>F(a
+  imenu API-Functions.datalog.UploadDatalog\ (start,count)       UploadDatalog(,);<Esc>F(a
+endif
+"----- global control  --------------------------------------------------------------------
+if NQCVIM_rcx_2 != 0 || NQCVIM_scout != 0
+  imenu API-Functions.global\ control.SetGlobalOutput\ (outputs,mode)            SetGlobalOutput(,);<Esc>F(a
+  imenu API-Functions.global\ control.SetGlobalDirection\ (outputs,mode)         SetGlobalDirection(,);<Esc>F(a
+  imenu API-Functions.global\ control.SetMaxPower\ (outputs,power)               SetMaxPower(,);<Esc>F(a
+  imenu API-Functions.global\ control.GlobalOutputStatus\ (n)                    GlobalOutputStatus();<Esc>F(a
+endif
+"----- serial  ----------------------------------------------------------------------------
+if NQCVIM_rcx_2 != 0
+  imenu API-Functions.serial.SetSerialComm\ (settings)           SetSerialComm();<Esc>F(a
+  imenu API-Functions.serial.SetSerialPacket\ (settings)         SetSerialPacket();<Esc>F(a
+  imenu API-Functions.serial.SetSerialData\ (n,value)            SetSerialData(,);<Esc>F(a
+  imenu API-Functions.serial.SerialData\ (n)                     SerialData();<Esc>F(a
+  imenu API-Functions.serial.SendSerial\ (start,count)           SendSerial(,);<Esc>F(a
+endif
+"----- VLL  --------------------------------------------------------------------------------
+if NQCVIM_scout != 0
+  imenu API-Functions.VLL.SendVLL\ (value)                       SendVLL();<Esc>F(a
+endif
+"----- access control ----------------------------------------------------------------------
+if NQCVIM_rcx_2 != 0 || NQCVIM_scout != 0
+  imenu API-Functions.access\ control.SetPriority\ (p)           SetPriority();<Esc>F(a
+endif
+"----- RCX2 events -------------------------------------------------------------------------
+if NQCVIM_rcx_2 != 0
+	imenu API-Functions.RCX2\ events.CalibrateEvent\ (event,lower,upper,hyst)    CalibrateEvent();<Esc>F(a          
+	imenu API-Functions.RCX2\ events.ClearAllEvents\ (\ )                        ClearAllEvents();
+	imenu API-Functions.RCX2\ events.ClearEvent(event)                           ClearEvent();<Esc>F(a
+	imenu API-Functions.RCX2\ events.ClickCounter\ (event)                       ClickCounter();<Esc>F(a
+	imenu API-Functions.RCX2\ events.ClickTime\ (event)                          ClickTime();<Esc>F(a
+	imenu API-Functions.RCX2\ events.EventState\ (event)                         EventState();<Esc>F(a
+	imenu API-Functions.RCX2\ events.Hysteresis\ (event)                         Hysteresis();<Esc>F(a
+	imenu API-Functions.RCX2\ events.LowerLimit\ (event)                         LowerLimit();<Esc>F(a
+	imenu API-Functions.RCX2\ events.SetClickCounter\ (event,value)              SetClickCounter();<Esc>F(a
+	imenu API-Functions.RCX2\ events.SetClickTime\ (event,value)                 SetClickTime();<Esc>F(a
+	imenu API-Functions.RCX2\ events.SetEvent\ (event,source,type)               SetEvent();<Esc>F(a
+	imenu API-Functions.RCX2\ events.SetHysteresis\ (event,value)                SetHysteresis();<Esc>F(a
+	imenu API-Functions.RCX2\ events.SetLowerLimit\ (event,limit)                SetLowerLimit();<Esc>F(a
+	imenu API-Functions.RCX2\ events.SetUpperLimit\ (event,limit)                SetUpperLimit();<Esc>F(a
+	imenu API-Functions.RCX2\ events.UpperLimit\ (event)                         UpperLimit();<Esc>F(a
+  imenu API-Functions.RCX2\ events.ActiveEvents\ (task)                        ActiveEvents();<Esc>F(a
+  imenu API-Functions.RCX2\ events.CurrentEvents\ (\ )                         CurrentEvents();
+  imenu API-Functions.RCX2\ events.Events\ (events)                            Events();<Esc>F(a
+endif
+"----- Scout events ------------------------------------------------------------------------
+if NQCVIM_scout != 0
+  imenu API-Functions.Scout\ events.ActiveEvents\ (task)                ActiveEvents();<Esc>F(a
+  imenu API-Functions.Scout\ events.Events\ (events)                    Events();<Esc>F(a
+  imenu API-Functions.Scout\ events.SetSensorClickTime\ (value)         SetSensorClickTime();<Esc>F(a
+  imenu API-Functions.Scout\ events.SetCounterLimit\ (n,value)          SetCounterLimit(,);<Esc>F(a
+  imenu API-Functions.Scout\ events.SetTimerLimit\ (n,value)            SetTimerLimit(,);<Esc>F(a
+endif
 "
 "
 "===============================================================================================
-"----- Menu : RCX-Constants --------------------------------------------------------------------
+"----- Menu : API-Constants --------------------------------------------------------------------
 "===============================================================================================
 "
+"----- access control ---------------------------------------------------------------------
+if NQCVIM_rcx_2 != 0 || NQCVIM_scout != 0
+	imenu API-Constants.access\ control.ACQUIRE_OUT_A   ACQUIRE_OUT_A
+	imenu API-Constants.access\ control.ACQUIRE_OUT_B   ACQUIRE_OUT_B
+	imenu API-Constants.access\ control.ACQUIRE_OUT_C   ACQUIRE_OUT_C
+	imenu API-Constants.access\ control.ACQUIRE_SOUND   ACQUIRE_SOUND
+endif
+if NQCVIM_rcx_2 != 0
+	imenu API-Constants.access\ control.ACQUIRE_USER_1  ACQUIRE_USER_1
+	imenu API-Constants.access\ control.ACQUIRE_USER_2  ACQUIRE_USER_2
+	imenu API-Constants.access\ control.ACQUIRE_USER_3  ACQUIRE_USER_3
+	imenu API-Constants.access\ control.ACQUIRE_USER_4  ACQUIRE_USER_4
+endif
 "----- display ----------------------------------------------------------------------------
-imenu RCX-Constants.display.DISPLAY_OUT_A           DISPLAY_OUT_A                   
-imenu RCX-Constants.display.DISPLAY_OUT_B           DISPLAY_OUT_B
-imenu RCX-Constants.display.DISPLAY_OUT_C           DISPLAY_OUT_C
-imenu RCX-Constants.display.DISPLAY_SENSOR_1        DISPLAY_SENSOR_1
-imenu RCX-Constants.display.DISPLAY_SENSOR_2        DISPLAY_SENSOR_2
-imenu RCX-Constants.display.DISPLAY_SENSOR_3        DISPLAY_SENSOR_3
-imenu RCX-Constants.display.DISPLAY_WATCH           DISPLAY_WATCH
+if NQCVIM_rcx != 0 || NQCVIM_rcx_2 != 0
+	imenu API-Constants.display.DISPLAY_OUT_A           DISPLAY_OUT_A                   
+	imenu API-Constants.display.DISPLAY_OUT_B           DISPLAY_OUT_B
+	imenu API-Constants.display.DISPLAY_OUT_C           DISPLAY_OUT_C
+	imenu API-Constants.display.DISPLAY_SENSOR_1        DISPLAY_SENSOR_1
+	imenu API-Constants.display.DISPLAY_SENSOR_2        DISPLAY_SENSOR_2
+	imenu API-Constants.display.DISPLAY_SENSOR_3        DISPLAY_SENSOR_3
+	imenu API-Constants.display.DISPLAY_WATCH           DISPLAY_WATCH
+endif
+if NQCVIM_rcx_2 != 0
+	imenu API-Constants.display.DISPLAY_USER            DISPLAY_USER
+endif
 "----- output  ----------------------------------------------------------------------------
-imenu RCX-Constants.output.OUT_A                    OUT_A
-imenu RCX-Constants.output.OUT_B                    OUT_B
-imenu RCX-Constants.output.OUT_C                    OUT_C
-imenu RCX-Constants.output.OUT_FLOAT                OUT_FLOAT
-imenu RCX-Constants.output.OUT_FULL                 OUT_FULL
-imenu RCX-Constants.output.OUT_FWD                  OUT_FWD
-imenu RCX-Constants.output.OUT_HALF                 OUT_HALF
-imenu RCX-Constants.output.OUT_LOW                  OUT_LOW
-imenu RCX-Constants.output.OUT_OFF                  OUT_OFF
-imenu RCX-Constants.output.OUT_ON                   OUT_ON
-imenu RCX-Constants.output.OUT_REV                  OUT_REV
-imenu RCX-Constants.output.OUT_TOGGLE               OUT_TOGGLE
+imenu API-Constants.output.OUT_A                    OUT_A
+imenu API-Constants.output.OUT_B                    OUT_B
+imenu API-Constants.output.OUT_C                    OUT_C
+imenu API-Constants.output.OUT_FLOAT                OUT_FLOAT
+imenu API-Constants.output.OUT_FULL                 OUT_FULL
+imenu API-Constants.output.OUT_FWD                  OUT_FWD
+imenu API-Constants.output.OUT_HALF                 OUT_HALF
+imenu API-Constants.output.OUT_LOW                  OUT_LOW
+imenu API-Constants.output.OUT_OFF                  OUT_OFF
+imenu API-Constants.output.OUT_ON                   OUT_ON
+imenu API-Constants.output.OUT_REV                  OUT_REV
+imenu API-Constants.output.OUT_TOGGLE               OUT_TOGGLE
 "----- sensor  ----------------------------------------------------------------------------
-imenu RCX-Constants.sensor.SENSOR_1                 SENSOR_1
-imenu RCX-Constants.sensor.SENSOR_2                 SENSOR_2
-imenu RCX-Constants.sensor.SENSOR_3                 SENSOR_3
-imenu RCX-Constants.sensor.SENSOR_CELSIUS           SENSOR_CELSIUS
-imenu RCX-Constants.sensor.SENSOR_EDGE              SENSOR_EDGE
-imenu RCX-Constants.sensor.SENSOR_FAHRENHEIT        SENSOR_FAHRENHEIT
-imenu RCX-Constants.sensor.SENSOR_LIGHT             SENSOR_LIGHT
-imenu RCX-Constants.sensor.SENSOR_MODE_BOOL         SENSOR_MODE_BOOL
-imenu RCX-Constants.sensor.SENSOR_MODE_CELSIUS      SENSOR_MODE_CELSIUS
-imenu RCX-Constants.sensor.SENSOR_MODE_EDGE         SENSOR_MODE_EDGE
-imenu RCX-Constants.sensor.SENSOR_MODE_FAHRENHEIT   SENSOR_MODE_FAHRENHEIT
-imenu RCX-Constants.sensor.SENSOR_MODE_PERCENT      SENSOR_MODE_PERCENT
-imenu RCX-Constants.sensor.SENSOR_MODE_PULSE        SENSOR_MODE_PULSE
-imenu RCX-Constants.sensor.SENSOR_MODE_RAW          SENSOR_MODE_RAW
-imenu RCX-Constants.sensor.SENSOR_MODE_ROTATION     SENSOR_MODE_ROTATION
-imenu RCX-Constants.sensor.SENSOR_PULSE             SENSOR_PULSE
-imenu RCX-Constants.sensor.SENSOR_ROTATION          SENSOR_ROTATION
-imenu RCX-Constants.sensor.SENSOR_TOUCH             SENSOR_TOUCH
-imenu RCX-Constants.sensor.SENSOR_TYPE_LIGHT        SENSOR_TYPE_LIGHT
-imenu RCX-Constants.sensor.SENSOR_TYPE_NONE         SENSOR_TYPE_NONE
-imenu RCX-Constants.sensor.SENSOR_TYPE_ROTATION     SENSOR_TYPE_ROTATION
-imenu RCX-Constants.sensor.SENSOR_TYPE_TEMPERATURE  SENSOR_TYPE_TEMPERATURE
-imenu RCX-Constants.sensor.SENSOR_TYPE_TOUCH        SENSOR_TYPE_TOUCH
+if NQCVIM_rcx_2 != 0
+  imenu API-Constants.serial.SERIAL_COMM_DEFAULT      SERIAL_COMM_DEFAULT
+  imenu API-Constants.serial.SERIAL_COMM_4800         SERIAL_COMM_4800 
+  imenu API-Constants.serial.SERIAL_COMM_DUTY25       SERIAL_COMM_DUTY25
+  imenu API-Constants.serial.SERIAL_COMM_76KHZ        SERIAL_COMM_76KHZ
+endif
+"----- sensor  ----------------------------------------------------------------------------
+if NQCVIM_rcx != 0 || NQCVIM_scout != 0
+  imenu API-Constants.sensor.SENSOR_1                 SENSOR_1
+  imenu API-Constants.sensor.SENSOR_2                 SENSOR_2
+  imenu API-Constants.sensor.SENSOR_3                 SENSOR_3
+  imenu API-Constants.sensor.SENSOR_CELSIUS           SENSOR_CELSIUS
+  imenu API-Constants.sensor.SENSOR_EDGE              SENSOR_EDGE
+  imenu API-Constants.sensor.SENSOR_FAHRENHEIT        SENSOR_FAHRENHEIT
+  imenu API-Constants.sensor.SENSOR_LIGHT             SENSOR_LIGHT
+  imenu API-Constants.sensor.SENSOR_MODE_BOOL         SENSOR_MODE_BOOL
+  imenu API-Constants.sensor.SENSOR_MODE_CELSIUS      SENSOR_MODE_CELSIUS
+  imenu API-Constants.sensor.SENSOR_MODE_EDGE         SENSOR_MODE_EDGE
+  imenu API-Constants.sensor.SENSOR_MODE_FAHRENHEIT   SENSOR_MODE_FAHRENHEIT
+  imenu API-Constants.sensor.SENSOR_MODE_PERCENT      SENSOR_MODE_PERCENT
+  imenu API-Constants.sensor.SENSOR_MODE_PULSE        SENSOR_MODE_PULSE
+  imenu API-Constants.sensor.SENSOR_MODE_RAW          SENSOR_MODE_RAW
+  imenu API-Constants.sensor.SENSOR_MODE_ROTATION     SENSOR_MODE_ROTATION
+  imenu API-Constants.sensor.SENSOR_PULSE             SENSOR_PULSE
+  imenu API-Constants.sensor.SENSOR_ROTATION          SENSOR_ROTATION
+  imenu API-Constants.sensor.SENSOR_TOUCH             SENSOR_TOUCH
+  imenu API-Constants.sensor.SENSOR_TYPE_LIGHT        SENSOR_TYPE_LIGHT
+  imenu API-Constants.sensor.SENSOR_TYPE_NONE         SENSOR_TYPE_NONE
+  imenu API-Constants.sensor.SENSOR_TYPE_ROTATION     SENSOR_TYPE_ROTATION
+  imenu API-Constants.sensor.SENSOR_TYPE_TEMPERATURE  SENSOR_TYPE_TEMPERATURE
+  imenu API-Constants.sensor.SENSOR_TYPE_TOUCH        SENSOR_TYPE_TOUCH
+endif
 "----- sound   ----------------------------------------------------------------------------
-imenu RCX-Constants.sound.SOUND_CLICK               SOUND_CLICK
-imenu RCX-Constants.sound.SOUND_DOUBLE_BEEP         SOUND_DOUBLE_BEEP
-imenu RCX-Constants.sound.SOUND_DOWN                SOUND_DOWN
-imenu RCX-Constants.sound.SOUND_FAST_UP             SOUND_FAST_UP
-imenu RCX-Constants.sound.SOUND_LOW_BEEP            SOUND_LOW_BEEP
-imenu RCX-Constants.sound.SOUND_UP                  SOUND_UP
+imenu API-Constants.sound.SOUND_CLICK               SOUND_CLICK
+imenu API-Constants.sound.SOUND_DOUBLE_BEEP         SOUND_DOUBLE_BEEP
+imenu API-Constants.sound.SOUND_DOWN                SOUND_DOWN
+imenu API-Constants.sound.SOUND_FAST_UP             SOUND_FAST_UP
+imenu API-Constants.sound.SOUND_LOW_BEEP            SOUND_LOW_BEEP
+imenu API-Constants.sound.SOUND_UP                  SOUND_UP
 "----- misc    ----------------------------------------------------------------------------
-imenu RCX-Constants.TX_POWER_HI                     TX_POWER_HI
-imenu RCX-Constants.TX_POWER_LO                     TX_POWER_LO       
+imenu API-Constants.TX_POWER_HI                     TX_POWER_HI
+imenu API-Constants.TX_POWER_LO                     TX_POWER_LO       
+"
+"----- Scout events -----------------------------------------------------------------------
+if NQCVIM_scout != 0
+  imenu API-Constants.Scout\ events.EVENT_1_PRESSED             EVENT_1_PRESSED
+  imenu API-Constants.Scout\ events.EVENT_2_PRESSED             EVENT_2_PRESSED
+  imenu API-Constants.Scout\ events.EVENT_1_RELEASED            EVENT_1_RELEASED
+  imenu API-Constants.Scout\ events.EVENT_2_RELEASED            EVENT_2_RELEASED
+	imenu API-Constants.Scout\ events.EVENT_LIGHT_HIGH            EVENT_LIGHT_HIGH  
+	imenu API-Constants.Scout\ events.EVENT_LIGHT_NORMAL          EVENT_LIGHT_NORMAL  
+	imenu API-Constants.Scout\ events.EVENT_LIGHT_LOW             EVENT_LIGHT_LOW   
+	imenu API-Constants.Scout\ events.EVENT_LIGHT_CLICK           EVENT_LIGHT_CLICK  
+	imenu API-Constants.Scout\ events.EVENT_LIGHT_DOUBLECLICK     EVENT_LIGHT_DOUBLECLICK  
+	imenu API-Constants.Scout\ events.EVENT_COUNTER_0             EVENT_COUNTER_0   
+	imenu API-Constants.Scout\ events.EVENT_COUNTER_1             EVENT_COUNTER_1   
+	imenu API-Constants.Scout\ events.EVENT_TIMER_0               EVENT_TIMER_0 
+	imenu API-Constants.Scout\ events.EVENT_TIMER_1               EVENT_TIMER_1 
+	imenu API-Constants.Scout\ events.EVENT_TIMER_2               EVENT_TIMER_2 
+	imenu API-Constants.Scout\ events.EVENT_MESSAGE               EVENT_MESSAGE 
+endif
 "
 "===============================================================================================
 "----- Menu : NQC-Run  -------------------------------------------------------------------------
@@ -264,21 +453,29 @@ imenu RCX-Constants.TX_POWER_LO                     TX_POWER_LO
 "
 amenu  NQC-&Run.save\ and\ &compile\ \ \<Alt\>\<F9\>       <C-C>:w<CR><Esc>:!nqc %<CR>
 amenu  NQC-&Run.-SEP1-                                     :
-amenu  NQC-&Run.download\ program\ 1\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 1 %<CR>
-amenu  NQC-&Run.download\ program\ 2\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 2 %<CR>
-amenu  NQC-&Run.download\ program\ 3\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 3 %<CR>
-amenu  NQC-&Run.download\ program\ 4\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 4 %<CR>
-amenu  NQC-&Run.download\ program\ 5\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 5 %<CR>
-amenu  NQC-&Run.-SEP2-                                     :
-amenu  NQC-&Run.download\ program\ 1\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 1 % -run<CR>
-amenu  NQC-&Run.download\ program\ 2\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 2 % -run<CR>
-amenu  NQC-&Run.download\ program\ 3\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 3 % -run<CR>
-amenu  NQC-&Run.download\ program\ 4\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 4 % -run<CR>
-amenu  NQC-&Run.download\ program\ 5\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 5 % -run<CR>
-amenu  NQC-&Run.-SEP3-                                     :
-amenu  NQC-&Run.download\ firmware\ to\ RCX                <C-C>:let @z="!nqc -firmware ".g:NQCVIM_RCX_Firmware<CR><Esc>:@z<CR>
-amenu  NQC-&Run.upload\ datalog\ into\ buffer              <C-C>:r !nqc -datalog 2>/dev/null <CR>
-amenu  NQC-&Run.erase\ programs\ and\ datalogs\ from\ RCX  <C-C>:! nqc -clear<CR>
+if NQCVIM_rcx != 0 || NQCVIM_rcx_2
+	amenu  NQC-&Run.download\ program\ 1\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 1 %<CR>
+	amenu  NQC-&Run.download\ program\ 2\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 2 %<CR>
+	amenu  NQC-&Run.download\ program\ 3\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 3 %<CR>
+	amenu  NQC-&Run.download\ program\ 4\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 4 %<CR>
+	amenu  NQC-&Run.download\ program\ 5\ to\ RCX              <C-C>:w<CR><Esc>:!nqc -d -pgm 5 %<CR>
+	amenu  NQC-&Run.-SEP2-                                     :
+	amenu  NQC-&Run.download\ program\ 1\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 1 % -run<CR>
+	amenu  NQC-&Run.download\ program\ 2\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 2 % -run<CR>
+	amenu  NQC-&Run.download\ program\ 3\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 3 % -run<CR>
+	amenu  NQC-&Run.download\ program\ 4\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 4 % -run<CR>
+	amenu  NQC-&Run.download\ program\ 5\ to\ RCX\ and\ Run    <C-C>:w<CR><Esc>:!nqc -d -pgm 5 % -run<CR>
+	amenu  NQC-&Run.-SEP3-                                     :
+	amenu  NQC-&Run.download\ firmware\ to\ RCX                <C-C>:let @z="!nqc -firmware ".g:NQCVIM_RCX_Firmware<CR><Esc>:@z<CR>
+	amenu  NQC-&Run.upload\ datalog\ into\ buffer              <C-C>:r !nqc -datalog 2>/dev/null <CR>
+	amenu  NQC-&Run.erase\ programs\ and\ datalogs\ from\ RCX  <C-C>:! nqc -clear<CR>
+endif
+if NQCVIM_scout != 0
+	amenu  NQC-&Run.download\ program\ to\ Scout               <C-C>:w<CR><Esc>:!nqc -d -TScout %<CR>
+endif
+if NQCVIM_cybermaster != 0
+	amenu  NQC-&Run.download\ program\ to\ CyberMaster         <C-C>:w<CR><Esc>:!nqc -d -TCM %<CR>
+endif
 "
 "===============================================================================================
 "----- vim Functions ---------------------------------------------------------------------------
@@ -298,8 +495,7 @@ endfunction
 "  NQC-Comments : Function  Comment
 "------------------------------------------------------------------------------
 function! NQCVIM_CommentFunction ()
-  let @z=    "//\n"
-  let @z= @z."//=====================================================================================\n"
+  let @z=    "//=====================================================================================\n"
   let @z= @z."//\n"
   let @z= @z."//        Name:  \n"
   let @z= @z."//\n"
@@ -315,7 +511,6 @@ function! NQCVIM_CommentFunction ()
   let @z= @z."//   Author:  ".g:NQCVIM_AuthorName."\n"
   let @z= @z."//     Date:  ".strftime("%x - %X")."\n"
   let @z= @z."//=====================================================================================\n"
-  let @z= @z."//\n"
   put z
 endfunction
 "
@@ -325,8 +520,7 @@ endfunction
 function! NQCVIM_CommentFilePrologue ()
 
 		let	File	= expand("%:t")								" name of the file in the current buffer 
-    let @z=    "//\n"
-    let @z= @z."//=====================================================================================\n"
+    let @z=    "//=====================================================================================\n"
     let @z= @z."//\n"
     let @z= @z."//       Filename:\t".File."\n"
     let @z= @z."//    Description:\t\n"
@@ -335,7 +529,6 @@ function! NQCVIM_CommentFilePrologue ()
     let @z= @z."//         Author:\t".g:NQCVIM_AuthorName."\n"
     let @z= @z."//        Created:\t".strftime("%x - %X")."\n"
     let @z= @z."//=====================================================================================\n"
-    let @z= @z."//\n\n"
     put! z
 endfunction
 "
