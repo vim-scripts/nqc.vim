@@ -1,30 +1,42 @@
 "
 "===============================================================================
-"==========  CUSTOMIZATION (vimrc)  ============================================
+"==========  load example vimrc from the distribution  =========================
 "===============================================================================
 "
-set autoread
-set autowrite
-set backupdir=$HOME/.vim.backupdir       " Don't forget to create this directory!
-set browsedir=current                    " Which directory to use for the file browser
-set incsearch
-set nowrap
-set shiftwidth=2
-set tabstop=2
-set visualbell
+" runtime vimrc_example.vim
 "
+"===============================================================================
+"==========  CUSTOMIZATION (vimrc)  ============================================
+"===============================================================================
+" shift down   : change window focus to lower one
+" shift up     : change window focus to upper one
+" shift left   : change window focus to one on left
+" shift right  : change window focus to one on right
+"
+nmap <s-down>   <c-w>j
+nmap <s-up>     <c-w>k
+nmap <s-left>   <c-w>h
+nmap <s-right>  <c-w>l
+"
+set autoread                          " read open files again when changed outside Vim
+set autowrite                         " write a modified buffer on each :next , ...
+set backupdir  =$HOME/.vim.backupdir  " directory for the backup files
+set browsedir  =current               " which directory to use for the file browser
+set incsearch                         " use incremental search
+set nowrap                            " do not wrap lines
+set shiftwidth =2                     " number of spaces to use for each step of indent
+set tabstop    =2                     " number of spaces that a <Tab> in the file counts for
+set visualbell                        " visual bell instead of beeping
 "
 "-------------------------------------------------------------------------------
 "  some additional hot keys
 "-------------------------------------------------------------------------------
-"
 "     F2  -  write file without confirmation
 "     F3  -  call file explorer Ex
 "     F4  -  show tag under curser in the preview window
 "     F6  -  list all errors           
 "     F7  -  display previous error
 "     F8  -  display next error   
-"           
 "  S-Tab  -  Fast switching between buffers (see below)
 "    C-q  -  Leave the editor with Ctrl-q (see below)
 "-------------------------------------------------------------------------------
@@ -45,35 +57,28 @@ imap  <silent> <F8>    <Esc>:cn<CR>
 "
 "-------------------------------------------------------------------------------
 " Fast switching between buffers
-" The current buffer will be written before switching to the next one.
+" The current buffer will be saved before switching to the next one.
 "-------------------------------------------------------------------------------
 "
- map  <silent> <s-tab>       :if &modifiable && !&readonly && &modified <cr> :w<cr> :endif<cr> :bp<cr> 
-imap  <silent> <s-tab>  <Esc>:if &modifiable && !&readonly && &modified <cr> :w<cr> :endif<cr> :bp<cr> 
-"
+ map  <silent> <s-tab>  <Esc>:if &modifiable && !&readonly && 
+     \                  &modified <CR> :write<CR> :endif<CR>:bprevious<CR>
+imap  <silent> <s-tab>  <Esc>:if &modifiable && !&readonly && 
+     \                  &modified <CR> :write<CR> :endif<CR>:bprevious<CR>
 "
 "-------------------------------------------------------------------------------
 " Leave the editor with Ctrl-q : Write all changed buffers and exit Vim
 "-------------------------------------------------------------------------------
-nmap	<C-q> 		:wqa<CR>
-"
-"
-"-------------------------------------------------------------------------------
-" use font with clearly distinguishable brackets : ()[]{}
-"-------------------------------------------------------------------------------
-" 
-set guifont=-b&h-lucidatypewriter-medium-r-normal-*-*-140-*-*-m-*-iso10646-1
-"
+nmap  <C-q>    :wqa<CR>
 "
 "-------------------------------------------------------------------------------
-" Change to the directory the file in your current buffer is in
+" Change the working directory to the directory containing the current file
 "-------------------------------------------------------------------------------
 if has("autocmd")
-	autocmd BufEnter * :lcd %:p:h
+  autocmd BufEnter * :lcd %:p:h
 endif " has("autocmd")
 "
 "-------------------------------------------------------------------------------
-" use of dictionaries
+" Use of dictionaries
 " 
 " dictionary : List of file names that are used to lookup words
 "              for keyword completion commands
@@ -83,11 +88,10 @@ endif " has("autocmd")
 set dictionary=$HOME/.vim/wordlists/german.list
 set complete+=k
 "
-"
 "-------------------------------------------------------------------------------
-" filename completion
+" Filename completion
 " 
-"   wildmenu : command-line completion operates in an enhanced 	mode
+"   wildmenu : command-line completion operates in an enhanced mode
 " wildignore : A file that matches with one of these
 "              patterns is ignored when completing file or directory names.
 "-------------------------------------------------------------------------------
@@ -95,46 +99,33 @@ set complete+=k
 set wildmenu
 set wildignore=*.bak,*.o,*.e,*~
 "
-"
 "-------------------------------------------------------------------------------
 " print options  (pc = percentage of the media size)
 "-------------------------------------------------------------------------------
-" 
 set printoptions=left:8pc,right:3pc
-"
-
-highlight Cursor guibg=Blue guifg=NONE
-
 
 "-------------------------------------------------------------------------------
-" c.vim
+" C-support.vim
 "-------------------------------------------------------------------------------
+let g:C_AuthorName   = 'Dr.-Ing. Fritz Mehner'
+let g:C_AuthorRef    = 'Mn'
+let g:C_Email        = 'mehner@fh-swf.de'
+let g:C_Company      = 'FH SÃ¼dwestfalen, Iserlohn'
+"                         
+"-------------------------------------------------------------------------------
+" taglist.vim : toggle the taglist window
+" taglist.vim : define the title texts for make
+" taglist.vim : define the title texts for qmake
+"-------------------------------------------------------------------------------
+ noremap <silent> <F11>  <Esc><Esc>:Tlist<CR>
+inoremap <silent> <F11>  <Esc><Esc>:Tlist<CR>
 
-let g:C_AuthorName      = "Dr.-Ing. Fritz Mehner"     
-let g:C_AuthorRef       = "Mn"                         
-let g:C_Email           = "mehner@fh-swf.de"            
-let g:C_Company         = "FH Südwestfalen, Iserlohn"    
-let g:C_Project         = ""
-let g:C_CopyrightHolder = ""
+let tlist_make_settings  = 'make;m:makros;t:targets'
 
-let g:C_CExtension      = "c"                    " C file extension; everything else is C++
-let g:C_CCompiler       = "gcc"                  " the C   compiler
-let g:C_CplusCompiler   = "g++"                  " the C++ compiler
-let g:C_CFlags          = "-Wall -g -O0 -c"      " compiler flags: compile, don't optimize
-let g:C_LFlags          = "-Wall -g -O0"         " compiler flags: link   , don't optimize
-let g:C_Libs            = "-lm"                  " libraries to use
+let tlist_qmake_settings = 'qmake;t:SystemVariables'
 
-
-let g:C_Dictionary_File =                         $HOME."/.vim/wordlists/c-c++-keywords.list"
-let g:C_Dictionary_File = g:C_Dictionary_File.",".$HOME."/.vim/wordlists/k+r.list"
-let g:C_Dictionary_File = g:C_Dictionary_File.",".$HOME."/.vim/wordlists/stl_index.list"
-let g:C_Dictionary_File = g:C_Dictionary_File.",".$HOME."/.vim/wordlists/german.list"
-
-" ----------  Insert header into new C/C++-files  ----------
 if has("autocmd")
-	autocmd BufNewFile  *.\(c\|cc\|cpp\|C\)  call C_CommentTemplates('cheader')
-	autocmd BufNewFile  *.\(h\|hpp\)         call C_CommentTemplates('hheader')
+  " ----------  qmake : set filetype for *.pro  ----------
+  autocmd BufNewFile,BufRead *.pro  set filetype=qmake
 endif " has("autocmd")
-
-
 

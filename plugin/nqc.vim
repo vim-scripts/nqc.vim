@@ -25,28 +25,29 @@
 "
 "  Configuration:  There are some personal details which should be configured 
 "                   (see the files README and nqcsupport.txt).
-"  
-let s:NQC_Version = "3.0"              " version number of this script; do not change
 "
 "         Author:  Dr.-Ing. Fritz Mehner
 "          Email:  mehner@fh-swh.de
 "
-"       Revision:  27.12.2003
+"        Version:  see variable  g:NQC_Version  below 
+"       Revision:  30.12.2004
 "        Created:  23.10.2002
-"      Copyright:  Copyright (C) 2002-2003 Dr.-Ing. Fritz Mehner  (mehner@fh-swf.de)
-"
-"                  This program is free software; you can redistribute it
-"                  and/or modify it under the terms of the GNU General Public
-"                  License as published by the Free Software Foundation;
-"                  either version 2 of the License, or (at your option) any
-"                  later version.
+"        License:  GPL (GNU Public License)
 "
 "###############################################################################################
+"
+" Prevent duplicate loading: 
+" 
+if exists("g:NQC_Version") || &cp
+ finish
+endif
+let g:NQC_Version= "3.1"  							" version number of this script; do not change
+"        
 "               
 "  Global variables (with default values) which can be overridden.
-"  ---------------------------------------------------------------
 "
-"  Personalization  (full name, email, ... ; used in comments) :
+"
+"  Modul global variables (with default values) which can be overridden.
 "
 let s:NQC_AuthorName     = ''
 let s:NQC_AuthorRef      = ''
@@ -63,18 +64,19 @@ let s:NQC_Target         = 'RCX2'                     " targets are: RCX2, RCX, 
 "  /dev/ttyS1  =  COM2
 "
 let s:NQC_Portname       = '/dev/ttyS0'
-let s:NQC_ShowMenues     = 'yes'            " show menues immediately after loading (yes/no)
-let s:NQC_Printer        = 'lpr'            " printer command
+let s:NQC_ShowMenues     = "yes"
+let s:NQC_Printer        = 'lpr'
 "                                           
-let s:NQC_CodeSnippets   = $HOME.'/.vim/codesnippets-nqc'   " NQC code snippet directory
+let s:NQC_CodeSnippets   = $HOME.'/.vim/codesnippets-nqc/'  " NQC code snippet directory
 let s:NQC_Root           = '&NQC.'                          " the name of the root menu of this plugin
 "
 "   ----- template files ---------------------------------------------
-let s:NQC_Template_Directory       = $HOME.'/.vim/plugin/templates/'
 let s:NQC_Template_Frame           = 'nqc-frame'
 let s:NQC_Template_C_File          = 'nqc-file-header'
 let s:NQC_Template_Task            = 'nqc-task-description'
+let s:NQC_Template_Directory       = $HOME.'/.vim/plugin/templates/'
 "
+let s:NQC_Comments   						   = "yes"
 " 
 "###############################################################################################
 "
@@ -101,10 +103,10 @@ call NQC_CheckGlobal("NQC_ShowMenues        ")
 call NQC_CheckGlobal("NQC_Printer           ")
 call NQC_CheckGlobal("NQC_CodeSnippets      ")
 call NQC_CheckGlobal("NQC_Root              ")
-call NQC_CheckGlobal("NQC_Template_Directory")
 call NQC_CheckGlobal("NQC_Template_C_File   ")
 call NQC_CheckGlobal("NQC_Template_Frame    ")
 call NQC_CheckGlobal("NQC_Template_Task     ")
+call NQC_CheckGlobal("NQC_Template_Directory")
 
 "------------------------------------------------------------------------------
 "  Initialization of NQC support menus
@@ -112,26 +114,35 @@ call NQC_CheckGlobal("NQC_Template_Task     ")
 "
 function! NQC_InitMenu ()
 	"
-	"----- Key Mappings ---------------------------------------------------------------------
-	"----- for developement only ------------------------------------------------------------
-	noremap  <F12>  <Esc><Esc>:write<CR><Esc>:so %<CR><Esc>:call NQC_Handle()<CR><Esc>:call NQC_Handle()<CR><Esc>:call NQC_Handle()<CR>
-	"
 	"===============================================================================================
 	"----- Menu : NQC-Comments ---------------------------------------------------------------------
 	"===============================================================================================
 	"
-	exe "amenu  ".s:NQC_Root.'&Comments.&Line\ End\ Comment               <Esc><Esc>A<Tab><Tab><Tab>// '
+	exe "amenu          ".s:NQC_Root.'&Comments.line\ &end\ comm\.\ \/\/         <Esc><Esc>A<Tab><Tab>//<Space>'
+	exe "vmenu          ".s:NQC_Root.'&Comments.line\ &end\ comm\.\ \/\/         <Esc><Esc>:call NQC_MultiLineEndComments("// ")<CR>A'
+	exe "amenu          ".s:NQC_Root.'&Comments.line\ e&nd\ comm\.\ \/*\ *\/     <Esc><Esc>A<Tab><Tab>/*  */<Esc>2hi'
+	exe "vmenu          ".s:NQC_Root.'&Comments.line\ e&nd\ comm\.\ \/*\ *\/     <Esc><Esc>:call NQC_MultiLineEndComments("/*  */")<CR>$2hi'
+	
+	exe "amenu          ".s:NQC_Root.'&Comments.mult&iline\ comm\.\ \/*\ *\/     <Esc><Esc>o/*<CR><Space>*/<Esc>kA<Space>'
+	exe "vmenu <silent> ".s:NQC_Root.'&Comments.mult&iline\ comm\.\ \/*\ *\/     <Esc><Esc>:call NQC_CodeComment("v","yes")<CR><Esc>:nohlsearch<CR>'
 
+	exe "amenu  ".s:NQC_Root.'&Comments.-SEP10-                              :'
+	exe "amenu <silent> ".s:NQC_Root.'&Comments.code\ ->\ comment\ \/&*\ *\/   <Esc><Esc>:call NQC_CodeComment("a","yes")<CR><Esc>:nohlsearch<CR>'
+	exe "vmenu <silent> ".s:NQC_Root.'&Comments.code\ ->\ comment\ \/&*\ *\/   <Esc><Esc>:call NQC_CodeComment("v","yes")<CR><Esc>:nohlsearch<CR>'
+	exe "amenu <silent> ".s:NQC_Root.'&Comments.code\ ->\ comment\ &\/\/       <Esc><Esc>:call NQC_CodeComment("a","no")<CR><Esc>:nohlsearch<CR>'
+	exe "vmenu <silent> ".s:NQC_Root.'&Comments.code\ ->\ comment\ &\/\/       <Esc><Esc>:call NQC_CodeComment("v","no")<CR><Esc>:nohlsearch<CR>'
+	exe "amenu <silent> ".s:NQC_Root.'&Comments.c&omment\ ->\ code         <Esc><Esc>:call NQC_CommentCode("a")<CR><Esc>:nohlsearch<CR>'
+	exe "vmenu <silent> ".s:NQC_Root.'&Comments.c&omment\ ->\ code         <Esc><Esc>:call NQC_CommentCode("v")<CR><Esc>:nohlsearch<CR>'
+	
+
+	exe "amenu  ".s:NQC_Root.'&Comments.-SEP20-                              :'
 	exe "amenu <silent> ".s:NQC_Root.'&Comments.&Frame\ Comment         <Esc><Esc>:call NQC_CommentTemplates("frame")<CR>'
-	exe "amenu <silent> ".s:NQC_Root.'&Comments.task\/function\/sub\ &Descr\.        <Esc><Esc>:call NQC_CommentTemplates("task")<CR>'
+	exe "amenu <silent> ".s:NQC_Root.'&Comments.tas&k\/function\/sub\ Descr\.        <Esc><Esc>:call NQC_CommentTemplates("task")<CR>'
 	exe "amenu <silent> ".s:NQC_Root.'&Comments.File\ &Prologue         <Esc><Esc>:call NQC_CommentTemplates("cheader")<CR>'
-	exe "amenu  ".s:NQC_Root.'&Comments.-SEP1-                            :'
+	exe "amenu  ".s:NQC_Root.'&Comments.-SEP30-                            :'
 	exe "amenu  ".s:NQC_Root.'&Comments.\/\/\ Date\ Time\ &Author         <Esc><Esc>$<Esc>:call NQC_CommentDateTimeAuthor() <CR>kJA'
 	
-	exe "vmenu  ".s:NQC_Root."&Comments.&code->comment                    <Esc><Esc>:'<,'>s#^#\/\/#<CR><Esc>:nohlsearch<CR>"
-	exe "vmenu  ".s:NQC_Root."&Comments.c&omment->code                    <Esc><Esc>:'<,'>s#^\/\/##<CR><Esc>:nohlsearch<CR>"
-	
-	exe "amenu  ".s:NQC_Root.'&Comments.-SEP2-                            :'
+	exe "amenu  ".s:NQC_Root.'&Comments.-SEP40-                            :'
 	exe " menu  ".s:NQC_Root.'&Comments.&Date                      i<C-R>=strftime("%x")<CR>'
 	exe "imenu  ".s:NQC_Root.'&Comments.&Date                       <C-R>=strftime("%x")<CR>'
 	exe " menu  ".s:NQC_Root.'&Comments.Date\ &Time                i<C-R>=strftime("%x %X %Z")<CR>'
@@ -232,6 +243,7 @@ function! NQC_InitMenu ()
 	exe "imenu ".s:NQC_Root.'API-&Functions.outputs.Toggle\ (outputs)                    Toggle();<Esc>F(a'
 	"
 	"----- sensor types, modes, information ---------------------------------------------------
+	exe " menu ".s:NQC_Root.'API-&Functions.sensors.ClearSensor\ (sensor)               aClearSensor();<Esc>F(a'
 	exe "imenu ".s:NQC_Root.'API-&Functions.sensors.ClearSensor\ (sensor)                ClearSensor();<Esc>F(a'
 	if s:NQC_Target=="RCX" || s:NQC_Target=="RCX2" || s:NQC_Target=="CM"
 		exe " menu ".s:NQC_Root.'API-&Functions.sensors.SensorMode\ (n)                    aSensorMode();<Esc>F(a'
@@ -810,8 +822,8 @@ function! NQC_InitMenu ()
 		exe "amenu  ".s:NQC_Root.'&Run.-SEP3-                                    :'
 		exe "amenu  ".s:NQC_Root.'&Run.&run\ current\ program                    <C-C>:call NQC_RunCurrent ()<CR>'
 		exe "imenu  ".s:NQC_Root.'&Run.-SEP4-                                    :'
-		exe "amenu  <silent> ".s:NQC_Root.'&Run.&hardcopy\ buffer\ to\ FILENAME\.ps       <C-C>:call Hardcopy("n")<CR>'
-		exe "vmenu  <silent> ".s:NQC_Root.'&Run.hard&copy\ highlighted\ part\ to\ FILENAME\.part\.ps   <C-C>:call Hardcopy("v")<CR>'
+		exe "amenu  <silent> ".s:NQC_Root.'&Run.&hardcopy\ to\ FILENAME\.ps         <C-C>:call NQC_Hardcopy("n")<CR>'
+		exe "vmenu  <silent> ".s:NQC_Root.'&Run.&hardcopy\ to\ FILENAME\.ps         <C-C>:call NQC_Hardcopy("v")<CR>'
 		exe "amenu  ".s:NQC_Root.'&Run.-SEP5-                                    :'
 		exe "amenu  ".s:NQC_Root.'&Run.&erase\ programs\ and\ datalogs\ from\ RCX <C-C>:call NQC_DatalogClear()<CR>'
 		exe "amenu  ".s:NQC_Root.'&Run.download\ &firmware\ to\ RCX               <C-C>:call NQC_DLoadFirmware("normal")<CR>'
@@ -833,13 +845,205 @@ endfunction			" function NQC_InitMenu
 "
 "
 "------------------------------------------------------------------------------
+"  Input after a highlighted prompt
+"------------------------------------------------------------------------------
+function! NQC_Input ( promp, text )
+	echohl Search												" highlight prompt
+	call inputsave()										" preserve typeahead
+	let	retval=input( a:promp, a:text )	" read input
+	call inputrestore()									" restore typeahead
+	echohl None													" reset highlighting
+	return retval
+endfunction
+"
+"----------------------------------------------------------------------
+"  Code -> Comment
+"----------------------------------------------------------------------
+function! NQC_CodeComment( mode, style )
+	if a:style==""
+		let style=s:NQC_Comments
+	else
+		let style=a:style
+	endif
+	if a:mode=="a"
+		if style == 'yes' 
+			silent exe ":s#^#/\* #"
+			silent put = ' */'
+		else
+			silent exe ":s#^#//#"
+		endif
+	endif
+	
+	if a:mode=="v"
+		if style == 'yes' 
+			silent exe ":'<,'>s/^/ \* /"
+			silent exe ":'< s'^ '\/'"
+			silent exe ":'>"
+			silent put = ' */'
+		else
+			silent exe ":'<,'>s#^#//#"
+		endif
+	endif
+	
+	return
+endfunction    " ----------  end of function  NQC_CodeComment  ----------
+"
+"----------------------------------------------------------------------
+"  Comment -> Code
+"----------------------------------------------------------------------
+function! NQC_CommentCode(mode)
+	if a:mode=="a"
+		let	pos1		= line(".")
+		let	pos2		= pos1
+	endif
+	if a:mode=="v"
+		let	pos1		= line("'<")
+		let	pos2		= line("'>")
+	endif
+
+	let	removed	= 0
+	" 
+	let	linenumber=pos1
+	while linenumber <= pos2
+		" Do we have a C++ comment ?
+		if getline(	linenumber ) =~ '^\s*//'
+			exe "silent :".linenumber.' s#^\s*//##'
+		endif
+		" Do we have a C   comment ?
+		if getline(	linenumber ) =~ s:NQC_StartMultilineComment
+			let removed = C_RemoveCComment(linenumber,pos2)
+		endif
+
+		if removed!=0
+			let linenumber = linenumber+removed
+			let	removed    = 0
+		else
+			let linenumber = linenumber+1
+		endif
+	endwhile
+endfunction    " ----------  end of function  NQC_CommentCode  ----------
+"
+"----------------------------------------------------------------------
+"  Comment -> Code
+"----------------------------------------------------------------------
+let s:NQC_StartMultilineComment	= '^\s*\/\*[\*! ]\='
+
+function! NQC_RemoveCComment( start, end )
+
+	if a:end-a:start<1
+		return 0										" lines removed
+	endif
+	" 
+	" Is the C-comment complete ? Get length.
+	" 
+	let check				= getline(	a:start ) =~ s:NQC_StartMultilineComment
+	let	linenumber	= a:start+1
+	while linenumber < a:end && getline(	linenumber ) !~ '^\s*\*\/'
+		let check				= check && getline(	linenumber ) =~ '^\s*\*[ ]\='
+		let linenumber	= linenumber+1
+	endwhile
+	let check = check && getline(	linenumber ) =~ '^\s*\*\/'
+	"
+	" remove a complete comment
+	" 
+	if check
+		exe "silent :".a:start.'   s/'.s:NQC_StartMultilineComment.'//'
+		let	linenumber1	= a:start+1
+		while linenumber1 < linenumber
+			exe "silent :".linenumber1.' s/^\s*\*[ ]\=//'
+			let linenumber1	= linenumber1+1
+		endwhile
+		exe "silent :".linenumber1.'   s/^\s*\*\///'
+	endif
+
+	return linenumber-a:start+1			" lines removed
+endfunction    " ----------  end of function  C_RemoveCComment  ----------
+
+function! NQC_CommentCode(mode)
+	if a:mode=="a"
+		let	pos1		= line(".")
+		let	pos2		= pos1
+	endif
+	if a:mode=="v"
+		let	pos1		= line("'<")
+		let	pos2		= line("'>")
+	endif
+
+	let	removed	= 0
+	" 
+	let	linenumber=pos1
+	while linenumber <= pos2
+		" Do we have a C++ comment ?
+		if getline(	linenumber ) =~ '^\s*//'
+			exe "silent :".linenumber.' s#^\s*//##'
+		endif
+		" Do we have a C   comment ?
+		if getline(	linenumber ) =~ s:NQC_StartMultilineComment
+			let removed = C_RemoveCComment(linenumber,pos2)
+		endif
+
+		if removed!=0
+			let linenumber = linenumber+removed
+			let	removed    = 0
+		else
+			let linenumber = linenumber+1
+		endif
+	endwhile
+endfunction    " ----------  end of function  NQC_CommentCode  ----------
+"
+"------------------------------------------------------------------------------
+"  Comments : multi line-end comments / empty lines (whitespaces) ignored
+"------------------------------------------------------------------------------
+function! NQC_MultiLineEndComments ( arg1 )
+	let	pos0	= line("'<")
+	let	pos1	= line("'>")
+	" ----- trim whitespaces -----
+	exe "'<,'>s/\s\*$//"
+	" ----- find the longest line -----
+	let	maxlength		= 0
+	let	linenumber	= pos0
+	normal '<
+	while linenumber <= pos1
+		if  getline(".") !~ "^\\s*$"  && maxlength<virtcol("$")
+			let maxlength= virtcol("$")
+		endif
+		let linenumber=linenumber+1
+		normal j
+	endwhile
+	let	maxlength	= maxlength-1
+	let	maxlength	= ((maxlength + &tabstop)/&tabstop)*&tabstop
+	" ----- fill lines with tabs -----
+	let	linenumber	= pos0
+	normal '<
+	while linenumber <= pos1
+		if getline(".") !~ "^\\s*$"
+			let ll		= virtcol("$")-1
+			let diff	= (maxlength-ll)/&tabstop
+			if ll%(&tabstop)!=0
+				let diff	= diff + 1
+			endif
+			let str=""		
+			while diff>0
+				let str=str."	"		
+				let diff=diff-1
+			endwhile
+			exe "normal	$a".str.a:arg1
+		endif
+		let linenumber=linenumber+1
+		normal j
+	endwhile
+	" ----- back to the beginning of the marked block -----
+	normal '<
+endfunction
+"
+"------------------------------------------------------------------------------
 "  Statements : #if .. #else .. #endif 
 "  Statements : #ifdef .. #else .. #endif 
 "  Statements : #ifndef .. #else .. #endif 
 "------------------------------------------------------------------------------
 function! NQC_PPIfElse (keyword,mode)
 	let identifier = "CONDITION"
-	let	identifier = inputdialog("(uppercase) condition for #".a:keyword, identifier )
+	let	identifier = NQC_Input("(uppercase) condition for #".a:keyword." : ", identifier )
 
 	if identifier != ""
 		if a:mode=='a'
@@ -867,7 +1071,7 @@ endfunction
 function! NQC_PPIfDef (arg)
 	" use filename without path (:t) and extension (:r) :
 	let identifier = toupper(expand("%:t:r"))."_INC"
-	let identifier = inputdialog("(uppercase) condition for #ifndef", identifier )
+	let identifier = NQC_Input("(uppercase) condition for #ifndef : ", identifier )
 	if identifier != ""
 		
 		if a:arg=='a'
@@ -1047,7 +1251,7 @@ endfunction
 "  NQC-Statements : task
 "------------------------------------------------------------------------------
 function! NQC_CodeTask ()
-  let identifier=inputdialog("task name", "main" )
+  let identifier=NQC_Input("task name : ", "main" )
   if identifier==""
     let identifier = "main"
   endif
@@ -1060,7 +1264,7 @@ endfunction
 "  NQC-Statements : function
 "------------------------------------------------------------------------------
 function! NQC_CodeInlineFunction ()
-	let identifier=inputdialog("function name", "func")
+	let identifier=NQC_Input("function name : ", "func")
 	if identifier==""
 		let identifier = "func"
 	endif
@@ -1073,7 +1277,7 @@ endfunction
 "  NQC-Statements : subroutine
 "------------------------------------------------------------------------------
 function! NQC_CodeSubroutine ()
-	let identifier=inputdialog("subroutine name", "subr")
+	let identifier=NQC_Input("subroutine name : ", "subr")
 	if identifier==""
 		let identifier = "subr"
 	endif
@@ -1143,12 +1347,18 @@ endfunction
 "  NQC-Statements : download firmware
 "------------------------------------------------------------------------------
 function! NQC_DLoadFirmware (n)
-	if a:n=="fast"
-		let zz= "!nqc  -S".s:NQC_Portname." -near -firmfast ".s:NQC_RCX_Firmware
+	if filereadable(s:NQC_RCX_Firmware)
+		if a:n=="fast"
+			let zz= "!nqc  -S".s:NQC_Portname." -near -firmfast ".s:NQC_RCX_Firmware
+		else
+			let zz= "!nqc  -S".s:NQC_Portname." -firmware ".s:NQC_RCX_Firmware
+		endif
+		exec zz
 	else
-		let zz= "!nqc  -S".s:NQC_Portname." -firmware ".s:NQC_RCX_Firmware
+		echohl ErrorMsg
+		echo "firmware file  ".s:NQC_RCX_Firmware." does not exist"
+		echohl None
 	endif
-	exec zz
 endfunction
 "
 "------------------------------------------------------------------------------
@@ -1169,7 +1379,7 @@ endfunction
 "  Datalog : set plot title
 "------------------------------------------------------------------------------
 function! NQC_DatalogPlotTitle()
-	let s:NQC_Plot_Title	= inputdialog("Plot Title",  s:NQC_Plot_Title )
+	let s:NQC_Plot_Title	= NQC_Input("Plot Title : ",  s:NQC_Plot_Title )
 endfunction
 
 "------------------------------------------------------------------------------
@@ -1203,8 +1413,8 @@ endfunction
 "------------------------------------------------------------------------------
 function! NQC_DatalogPlot (n)
 
-	if system("which gnuplot 2>/dev/null")==""
-		echo "**  program gnuplot is not available  **"
+	if has("unix") && system("which gnuplot 2>/dev/null")==""
+		echohl ErrorMsg | echo "**  program gnuplot is not available  **" | echohl None
 		return
 	endif
 
@@ -1340,15 +1550,17 @@ endfunction
 "------------------------------------------------------------------------------
 "  run : hardcopy
 "------------------------------------------------------------------------------
-function! Hardcopy (arg1)
+function! NQC_Hardcopy (arg1)
 	let	Sou		= expand("%")								" name of the file in the current buffer
 	" ----- normal mode ----------------
 	if a:arg1=="n"
-		exe	"hardcopy > ".Sou.".ps"		
+		silent exe	"hardcopy > ".Sou.".ps"		
+		echo "file \"".Sou."\" printed to \"".Sou.".ps\""
 	endif
 	" ----- visual mode ----------------
 	if a:arg1=="v"
-		exe	"*hardcopy > ".Sou.".part.ps"		
+		silent exe	"*hardcopy > ".Sou.".ps"		
+		echo "file \"".Sou."\" (lines ".line("'<")."-".line("'>").") printed to \"".Sou.".ps\""
 	endif
 endfunction
 "
@@ -1356,22 +1568,23 @@ endfunction
 "  run : settings
 "------------------------------------------------------------------------------
 function! NQC_Settings ()
-  let settings =          "nqc.vim settings:\n"
-	let settings = settings."author  :  ".s:NQC_AuthorName." (".s:NQC_AuthorRef.") ".s:NQC_Email."\n"
-	let settings = settings."project :  ".s:NQC_Project."\n"
-	let settings = settings."copyright holder :  ".s:NQC_CopyrightHolder."\n"
-  let settings = settings."\n"
-  let settings = settings."target :  ".s:NQC_Target."\n"
-  let settings = settings."port :  ".s:NQC_Portname."\n"
-  let settings = settings."firmware :  ".s:NQC_RCX_Firmware."\n"
-	let settings = settings."code snippet directory  :  ".s:NQC_CodeSnippets."\n"
-	let settings = settings."template directory  :  ".s:NQC_Template_Directory."\n"
-	let settings = settings."printer :  ".s:NQC_Printer."\n"
-  let settings = settings."\nhot keys:        \n"
-  let settings = settings."F9  :  save and compile buffer\n"
-  let settings = settings."----------------------------------------------------------------------------------------\n"
-  let settings = settings."NQC-Support, Version ".s:NQC_Version."  /  Dr.-Ing. Fritz Mehner  /  mehner@fh-swf.de\n"
-  let dummy=confirm( settings, "ok", 1, "Info" )
+  let txt =     "       nqc.vim settings\n\n"
+	let txt = txt."            author name :  ".s:NQC_AuthorName."\n"
+	let txt = txt."               initials :  ".s:NQC_AuthorRef."\n"
+	let txt = txt."                  email :  ".s:NQC_Email."\n"
+	let txt = txt."                project :  ".s:NQC_Project."\n"
+	let txt = txt."       copyright holder :  ".s:NQC_CopyrightHolder."\n"
+  let txt = txt."                 target :  ".s:NQC_Target."\n"
+  let txt = txt."                   port :  ".s:NQC_Portname."\n"
+  let txt = txt."               firmware :  ".s:NQC_RCX_Firmware."\n"
+	let txt = txt." code snippet directory :  ".s:NQC_CodeSnippets."\n"
+	let txt = txt."    template directory  :  ".s:NQC_Template_Directory."\n"
+	let txt = txt."                printer :  ".s:NQC_Printer."\n\n"
+	let txt = txt."    Additional hot keys\n\n"
+  let txt = txt."                    F9  :  save and compile buffer\n"
+	let txt = txt."_________________________________________________________________________\n"
+  let txt = txt."NQC-Support, Version ".g:NQC_Version." / Dr.-Ing. Fritz Mehner / mehner@fh-swf.de\n"
+	echo txt
 endfunction
 "
 "------------------------------------------------------------------------------
@@ -1441,5 +1654,13 @@ if s:NQC_ShowMenues == "yes"
 	call NQC_Handle()											" load the menus
 endif
 "
+"------------------------------------------------------------------------------
+"  Automated header insertion
+"------------------------------------------------------------------------------
+"
+if has("autocmd")
+	autocmd BufNewFile  *.nqc  call NQC_CommentTemplates('cheader')
+endif " has("autocmd")
+
 "=====================================================================================
 " vim: set tabstop=2: set shiftwidth=2:

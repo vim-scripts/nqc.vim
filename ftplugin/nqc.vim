@@ -3,7 +3,7 @@
 " Language   :  NQC - Not Quite C
 " Plugin     :  nqc.vim
 " Maintainer :  Fritz Mehner <mehner@fh-swf.de>
-" Last Change:  27.12.2003
+" Last Change:  26.05.2004
 "
 " -----------------------------------------------------------------
 "
@@ -18,6 +18,6 @@ let b:did_NQC_ftplugin = 1
 "
 "       F9   save and compile 
 "
-   noremap  <F9>    :call NQC_SaveCompile()<CR>
-  inoremap  <F9>    <Esc>:call NQC_SaveCompile()<CR>
+   noremap  <<buffer>  F9>         :call NQC_SaveCompile()<CR>
+  inoremap  <<buffer>  F9>    <Esc>:call NQC_SaveCompile()<CR>
 

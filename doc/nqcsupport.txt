@@ -1,19 +1,26 @@
-*nqcsupport.txt*             NQC Support             Last Change: Dec  27  2003
+*nqcsupport.txt*             NQC Support             Last Change: Dec  30  2004
 
 NQC Support                                                        *nqcsupport*
-                            Plugin version 3.0
+                            Plugin version 3.1
                       for Vim version 6.0 and above
                      Fritz Mehner  <mehner@fh-swf.de>
 
 Write and run NQC programs using menus.
 
-|nqcsupport-usage-gvim|        Usage 
-|nqcsupport-hotkeys|           Hotkeys
-|nqcsupport-customization|     Customization and configuration
-|nqcsupport-template-files|    Template files and tags
-|nqcsupport-code-snippets|     Code Snippets
-|nqcsupport-release-notes|     Release Notes
-|add-local-help|               How to add this help file to Vim's help
+ 1.    Usage                                           |nqcsupport-usage-gvim|         
+ 1.1    Menu 'Comments'                                |nqcsupport-comm|
+ 1.1.1   Append aligned comments to consecutive lines  |nqcsupport-comm-1|
+ 1.1.2   Multiline comment                             |nqcsupport-comm-2|
+ 1.1.3   Code to comment                               |nqcsupport-comm-3|
+ 1.1.4   Comment to code                               |nqcsupport-comm-4|
+ 1.1.5   Frame comments, file header, ...              |nqcsupport-comm-5|
+ 1.2    Menu 'Statements'                              |nqcsupport-stat|
+ 1.3    Menu 'Snippets'                                |nqcsupport-snippets|
+ 2.    Hotkeys                                         |nqcsupport-hotkeys|            
+ 3.    Customization and configuration                 |nqcsupport-customization|      
+ 4.    Template files and tags                         |nqcsupport-template-files|     
+ 5.    Release Notes                                   |nqcsupport-release-notes|      
+       How to add this help file to Vim's help         |add-local-help|             
 
 
 ==============================================================================
@@ -23,30 +30,134 @@ USAGE with GUI  (gVim)                                 *nqcsupport-usage-gvim*
 If the root menu 'NQC' is not visible call it with the entry "Load NQC Support" 
 from the standard Tools-menu.
 
---------------------
-Menu 'Comments'
---------------------
+------------------------------------------------------------------------------
+1.1 MENU 'Comments'                                          *nqcsupport-comm*
+------------------------------------------------------------------------------
 
-(1) A frame comment, a file prologue and a task/function/sub description are
-read as templates from the appropriate files (see |nqcsupport-customization|).
+1.1.1 APPEND ALIGNED COMMENTS TO CONSECUTIVE LINES         *nqcsupport-comm-1*
 
-(2) 'code-comment' and 'comment->code' are for commenting/uncommenting 
-visually selected blocks.  A marked block
+In NORMAL MODE the menu entries
+ 'Line End Comm. //' 
+ 'Line End Comm. /**/' 
+will append the indicated comment to the current line.
+
+In VISUAL MODE these entries will append aligned comments to all marked lines.
+Marking the first 4 lines
+
+     Rev(RIGHT+LEFT);
+     Wait(100);
+     Fwd(RIGHT);
+     Wait(300 + Random(300));
+
+and choosing 'Line End Comm. /**/' will yield.
+
+     Rev(RIGHT+LEFT);         /*  */
+     Wait(100);               /*  */
+     Fwd(RIGHT);              /*  */
+     Wait(300 + Random(300)); /*  */
+
+The cursor will be positioned inside the first comment.
+
+------------------------------------------------------------------------------
+
+1.1.2 MULTILINE COMMENT                                    *nqcsupport-comm-2*
+
+NORMAL MODE, INSERT MODE. The comment shown below will be inserted.
+
+  /*
+   * 
+   */
+
+VISUAL MODE. A marked block
+
+xxxxxxxx
+xxxxxxxx
+
+will be changed into a multiline comment (all (partially) marked lines):
+
+/* xxxxxxxx
+ * xxxxxxxx
+ */
+
+
+------------------------------------------------------------------------------
+
+1.1.3 CODE TO COMMENT                                      *nqcsupport-comm-3*
+
+A marked block
 
 xxxxxxxx
 xxxxxxxx
 xxxxxxxx
 
-will be changed to
+will be changed by the menu entry 'code->comment /**/' into a multiline comment
+(all (partially) marked lines):
+
+/* xxxxxxxx
+ * xxxxxxxx
+ * xxxxxxxx
+ */
+
+The menu entry 'code->comment //' changes the block into
 
 // xxxxxxxx
 // xxxxxxxx
 // xxxxxxxx
 
+The menu entry works also for a single line. A single line needs not to be
+marked. 
 
---------------------
-Menu 'Statements'
---------------------
+------------------------------------------------------------------------------
+
+1.1.4 COMMENT TO CODE                                      *nqcsupport-comm-4*
+
+If one (or more) complete comment (i.e. all lines belonging to the comment) is
+marked the entry 'comment->code' will uncomment it.  If the following lines
+are marked
+
+   * ClearTimer(0);
+   */
+
+  counter = 0;
+
+  //  Fwd(RIGHT);
+  //
+
+  /* 
+   *  Wait(300 + Random(300));
+   */
+
+uncommenting will yield
+
+   * ClearTimer(0);
+   */
+
+  counter = 0;
+
+  Fwd(RIGHT);
+
+
+
+ Wait(300 + Random(300));
+
+
+The first 2 lines are only a part of a C-comment and remain unchanged.
+A C-comment can start with /* , /** or /*! .
+
+The menu entry works also for a single line with a leading // . A single line
+needs not to be marked. 
+
+------------------------------------------------------------------------------
+
+1.1.5 FRAME COMMENTS, FILE HEADER, ...                     *nqcsupport-comm-5*
+
+Frame comments, file header comments and function descriptions are read as
+templates from the appropriate files (see |nqcsupport-template-files|).
+
+
+------------------------------------------------------------------------------
+1.2  MENU 'Statements'                                       *nqcsupport-stat*
+------------------------------------------------------------------------------
 
 (1) Normal mode, insert mode. 
 An empty statement will be inserted and properly indented. The entry 'if{}'
@@ -144,8 +255,36 @@ The lines will be indented after insertion.
 
 
 
+------------------------------------------------------------------------------
+1.3  MENU 'Snippets'                                     *nqcsupport-snippets*
+------------------------------------------------------------------------------
+
+Code snippets are pieces of code which are kept in separate files in a special
+directory (e.g. a few lines of code or a complete template for a Makefile).
+File names are used to identify the snippets.  The snippet directory has to be
+created by the user ( $HOME/.vim/codesnippets-nqc is the default).
+Snippets are managed with the 3 entries 
+
+   NQC -> Snippets -> read  code snippet
+   NQC -> Snippets -> write code snippet
+   NQC -> Snippets -> edit  code snippet
+
+from the Snippets submenu.
+
+Creating a new snippet:  
+-----------------------
+When nothing is marked, "write code snippet" will write the whole buffer 
+to a snippet file, otherwise the marked area will be written to a file.
+
+Insert a snippet:
+-----------------
+Select the appropriate file from the snippet directory ("read  code snippet").
+The inserted lines will be indented.
+
+
+
 ==============================================================================
-HOTKEYS                                                   *nqcsupport-hotkeys*
+2.  HOTKEYS                                               *nqcsupport-hotkeys*
 ==============================================================================
 
 The following hotkey is defined in normal, visual and insert mode: 
@@ -156,7 +295,7 @@ The hotkey is defined in the filetype plugin nqc.vim .
 
 
 ==============================================================================
-CUSTOMIZATION                                       *nqcsupport-customization*
+3.  CUSTOMIZATION                                   *nqcsupport-customization*
 ==============================================================================
 
 Several global variables are checked by the script to customize it:
@@ -230,7 +369,7 @@ programmers.
 
 
 ==============================================================================
-TEMPLATE FILES AND TAGS                            *nqcsupport-template-files*
+4.  TEMPLATE FILES AND TAGS                        *nqcsupport-template-files*
 ==============================================================================
 
 Some menu entries generate comments or commented code. 
@@ -265,7 +404,7 @@ information when the file is read in:
     |COPYRIGHTHOLDER|
     |EMAIL|
     |PROJECT|
-		
+
     |DATE|
     |FILENAME|
     |TIME|
@@ -279,95 +418,11 @@ The tag |CURSOR| will be the cursor position after the block is read in.
 There is no need to use any of these tags, some or all can be missing.
 The template files can actually be links pointing to existing templates.
 
-
 ==============================================================================
-CODE SNIPPETS                                       *nqcsupport-code-snippets*
-==============================================================================
-
-Code snippets are pieces of code which are kept in separate files in a special
-directory (e.g. a few lines of code or a complete template for a Makefile).
-File names are used to identify the snippets.  The snippet directory has to be
-created by the user ( $HOME/.vim/codesnippets-nqc is the default).
-Snippets are managed with the 3 entries 
-
-   NQC -> Snippets -> read  code snippet
-   NQC -> Snippets -> write code snippet
-   NQC -> Snippets -> edit  code snippet
-
-from the Snippets submenu.
-
-Creating a new snippet:  
------------------------
-When nothing is marked, "write code snippet" will write the whole buffer 
-to a snippet file, otherwise the marked area will be written to a file.
-
-Insert a snippet:
------------------
-Select the appropriate file from the snippet directory ("read  code snippet").
-The inserted lines will be indented.
-
-
-
-==============================================================================
-Release Notes                                       *nqcsupport-release-notes*
+5.  RELEASE NOTES                                   *nqcsupport-release-notes*
 ==============================================================================
 
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 3.0
-------------------------------------------------------------------------------
- + Only one NQC root menu entry in the gVim root menu.
- + A marked region can be surrounded by a for-, if, if-else, while-,
-   do-while-statement (with indentation).
- + 3 block comments are now read as templates or skeletons from files
- + The NQC root menu can be changed or disabled.
- + All hotkeys are only defined for NQC files (file type plugin added).
- + Install script added.
- + Customization improved.
- + Documentation improved (help file added).
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 2.0
-------------------------------------------------------------------------------
- + indentation: multiline inserts and code snippets will be indented after 
-   insertion.
- + Most menu entries are now also active in normal mode.
- + Code cleanup: register z no longer used. Most function calls are silent now.
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 1.9
-------------------------------------------------------------------------------
- - maintain your own code snippets in a separate directory
- - additional for- and if-statements
- - new hotkey (save, open file, save buffer and compile)
- - analyse datalog with GNUPLOT
-   + upload datalog in a separate buffer
-   + show x- or x-y-plot 
-   + configure plot (type: impulses, lines, lines+points, points, steps)
-   + set plot title
-   + save plot (Postscript) or print plot
- - make hardcopy of buffer or of a highlighted part (Postscript)
- - show settings (target, serial port, firmware, hotkeys) 
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 1.6.3
-------------------------------------------------------------------------------
- - menus can now be toggled (look for an entry in the Tools menu)
- - additional NQC-statements:  break unti continue start
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 1.5
-------------------------------------------------------------------------------
- - API for NQC Vers. 2.3r1 complete 
- - configurability improved 
- - minor bugfixes and improvements
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 1.4
-------------------------------------------------------------------------------
- - support for RCX, RCX2, CyberMaster, Scout
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 1.3.1
-------------------------------------------------------------------------------
- - bug fix: datalog upload
-------------------------------------------------------------------------------
-  RELEASE NOTES FOR VERSION 1.3
-------------------------------------------------------------------------------
- - Initial upload
+See file README.nqc .
 
 ==============================================================================
 vim:tw=78:noet:ts=2:ft=help:norl:
