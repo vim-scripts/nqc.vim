@@ -1,0 +1,373 @@
+*nqcsupport.txt*             NQC Support             Last Change: Dec  27  2003
+
+NQC Support                                                        *nqcsupport*
+                            Plugin version 3.0
+                      for Vim version 6.0 and above
+                     Fritz Mehner  <mehner@fh-swf.de>
+
+Write and run NQC programs using menus.
+
+|nqcsupport-usage-gvim|        Usage 
+|nqcsupport-hotkeys|           Hotkeys
+|nqcsupport-customization|     Customization and configuration
+|nqcsupport-template-files|    Template files and tags
+|nqcsupport-code-snippets|     Code Snippets
+|nqcsupport-release-notes|     Release Notes
+|add-local-help|               How to add this help file to Vim's help
+
+
+==============================================================================
+USAGE with GUI  (gVim)                                 *nqcsupport-usage-gvim*
+==============================================================================
+
+If the root menu 'NQC' is not visible call it with the entry "Load NQC Support" 
+from the standard Tools-menu.
+
+--------------------
+Menu 'Comments'
+--------------------
+
+(1) A frame comment, a file prologue and a task/function/sub description are
+read as templates from the appropriate files (see |nqcsupport-customization|).
+
+(2) 'code-comment' and 'comment->code' are for commenting/uncommenting 
+visually selected blocks.  A marked block
+
+xxxxxxxx
+xxxxxxxx
+xxxxxxxx
+
+will be changed to
+
+// xxxxxxxx
+// xxxxxxxx
+// xxxxxxxx
+
+
+--------------------
+Menu 'Statements'
+--------------------
+
+(1) Normal mode, insert mode. 
+An empty statement will be inserted and properly indented. The entry 'if{}'
+will insert an if-statement:
+
+if (  )
+{
+}
+
+(2) Visual mode.
+(2.1) Statements with blocks and case label.  The highlighted area 
+
+xxxxx
+xxxxx
+
+will be surrounded by one of the following statements:
+
+  +----------------------------+-----------------------------+
+  |     if (  )                |     if (  )                 |
+  |     {                      |     {                       |
+  |       xxxxx                |       xxxxx                 |
+  |       xxxxx                |       xxxxx                 |
+  |     }                      |     }                       |
+  |                            |     else                    |
+  |                            |     {                       |
+  |                            |     }                       |
+  +----------------------------+-----------------------------+
+  |     for ( ; ;  )           |     while (  )              |
+  |     {                      |     {                       |
+  |       xxxxx                |       xxxxx                 |
+  |       xxxxx                |       xxxxx                 |
+  |     }                      |     }                       |
+  +----------------------------+-----------------------------+
+  |     do                     |                             |
+  |     {                      |     {                       |
+  |       xxxxx                |       xxxxx                 |
+  |       xxxxx                |       xxxxx                 |
+  |     }                      |     }                       |
+  |     while (  );            |                             |
+  +----------------------------+-----------------------------+
+  |     case :                 |                             |
+  |       xxxxx                |                             |
+  |       xxxxx                |                             |
+  |       break;               |                             |
+  +----------------------------+-----------------------------+
+  |    #if  CONDITION                                        |
+  |    xxxxx                                                 |
+  |    xxxxx                                                 |
+  |    #else      /* ----- #if CONDITION  ----- */           |
+  |                                                          |
+  |    #endif     /* ----- #if CONDITION  ----- */           |
+  +----------------------------------------------------------+
+  |    #ifdef  CONDITION                                     |
+  |    xxxxx                                                 |
+  |    xxxxx                                                 |
+  |    #else      /* ----- #ifdef CONDITION  ----- */        |
+  |                                                          |
+  |    #endif     /* ----- #ifdef CONDITION  ----- */        |
+  +----------------------------------------------------------+
+  |    #ifndef  CONDITION                                    |
+  |    xxxxx                                                 |
+  |    xxxxx                                                 |
+  |    #else      /* ----- #ifndef CONDITION  ----- */       |
+  |                                                          |
+  |    #endif     /* ----- #ifndef CONDITION  ----- */       |
+  +----------------------------------------------------------+
+  |    #ifndef  TEST_INC                                     |
+  |    #define  TEST_INC                                     |
+  |    xxxxx                                                 |
+  |    xxxxx                                                 |
+  |    #endif   /* ----- #ifndef TEST_INC  ----- */          |
+  +----------------------------------------------------------+
+
+The whole statement will be indented after insertion.
+
+(2.2) Statements without blocks.  Above the highlighted lines 
+
+xxxxx
+xxxxx
+
+one of the following statements will be put:
+
+  +-------------------------------+--------------------------+
+  |    if (  )                    |    for ( ; ;  )          |
+  |      xxxxx                    |      xxxxx               |
+  |    xxxxxxx                    |    xxxxx                 |
+  +-------------------------------+--------------------------+
+  |    if (  )                    |    while (  )            |
+  |      xxxxx                    |      xxxxx               |
+  |    xxxxx                      |    xxxxx                 |
+  |    else                       |                          |
+  +-------------------------------+--------------------------+
+
+The lines will be indented after insertion.
+
+
+
+==============================================================================
+HOTKEYS                                                   *nqcsupport-hotkeys*
+==============================================================================
+
+The following hotkey is defined in normal, visual and insert mode: 
+
+       F9   save and compile 
+
+The hotkey is defined in the filetype plugin nqc.vim .
+
+
+==============================================================================
+CUSTOMIZATION                                       *nqcsupport-customization*
+==============================================================================
+
+Several global variables are checked by the script to customize it:
+
+  ----------------------------------------------------------------------------
+  GLOBAL VARIABLE           DEFAULT VALUE                    TAG (see below)
+  ----------------------------------------------------------------------------
+  g:NQC_AuthorName          ""                               |AUTHOR|
+  g:NQC_AuthorRef           ""                               |AUTHORREF|
+  g:NQC_Email               ""                               |EMAIL|
+  g:NQC_Project             ""                               |PROJECT|
+  g:NQC_CopyrightHolder     ""                               |COPYRIGHTHOLDER|
+
+  g:NQC_Template_Directory  $HOME.'/.vim/plugin/templates/'
+  g:NQC_Template_C_File     'nqc-file-header'
+  g:NQC_Template_Frame      'nqc-frame'
+  g:NQC_Template_Task       'nqc-task-description'
+
+  g:NQC_CodeSnippets        $HOME.'/.vim/codesnippets-nqc/'
+  g:NQC_ShowMenues          'yes'
+  g:NQC_Root                '&NQC'
+  g:NQC_Printer             'lpr'
+
+  g:NQC_RCX_Firmware        $HOME.'/bin/firm0328.lgo'
+  g:NQC_Target              'RCX2'
+  g:NQC_Portname            '/dev/ttyS0'
+
+  ----------------------------------------------------------------------------
+
+1. group: Defines the text which will be inserted for the tags when a template  
+          is read in (see also |nqcsupport-template-files| below).
+
+          g:NQC_AuthorName         : author name
+          g:NQC_AuthorRef          : author reference (e.g. acronym)
+          g:NQC_Email              : email address
+          g:NQC_Project            : project
+          g:NQC_CopyrightHolder    : the copyright holder
+
+2. group: g:NQC_Template_Directory : Sets the template directory and the names of the 
+           ...                       template files (see |nqcsupport-template-files|).
+
+3. group: g:NQC_CodeSnippets       : The name of the code snippet directory 
+                                     (see |nqcsupport-code-snippets|).
+          g:NQC_Root               : the name of the root menu of this plugin
+          g:NQC_ShowMenues         : Load menus ("yes", "no") at startup.
+          g:NQC_Printer            : The printcommand used by gnuplot
+
+4. group: g:NQC_RCX_Firmware       : RCX-Firmware: full path and filename
+          g:NQC_Target             : The target:   RCX2, RCX, Scout, CM
+          g:NQC_Portname           : The port used for upload / download
+
+To override the defaults add appropriate assignments to .vimrc .
+Here are my settings as an example:
+
+  let g:NQC_AuthorName      = "Dr.-Ing. Fritz Mehner"    
+  let g:NQC_AuthorRef       = "Mn"                       
+  let g:NQC_Email           = "mehner@fh-swf.de"         
+
+The root menu
+-------------
+The variable g:NQC_Root, if set (in .vimrc or in .gvimrc), give the name of the
+single Vim root menu entry in which the NQC submenus will be put. 
+The default is 
+                  '&NQC.'
+Note the termination dot. A single root menu can be used if the screen is
+limited or several plugins are used in parallel.
+
+If set to "", this single root menu entry will not appear.  Now all submenus
+are put into the Vim root menu. This is nice for beginners or for NQC-only
+programmers.
+
+
+==============================================================================
+TEMPLATE FILES AND TAGS                            *nqcsupport-template-files*
+==============================================================================
+
+Some menu entries generate comments or commented code. 
+Three menu entries generate block comments:
+
+    Frame Comment
+    File Prologue
+    task/function/sub Descr.
+
+The comments which will be inserted by these menus entries are read from files:
+
++--------------------------+-------------------------------------------------+
+| menu entry               | global variable       | file (distribution set) |
++--------------------------+-----------------------+-------------------------+
+| Frame Comment            | g:NQC_Template_Frame  | nqc-frame               |
+| File Prologue            | g:NQC_Template_C_File | nqc-file-header         |
+| task/function/sub Descr. | g:NQC_Template_Task   | nqc-task-description    |
++--------------------------+-------------------------------------------------+
+
+The template files can be written or changed by the user to fulfill special
+requirements (layout already exists, file headers / blocks have to be prepared
+for a documentation tool, ... ).  They can hold not only comments but a
+complete file skeleton if this is necessary. So you may want to lay out your
+own templates.
+
+The comments in these files do not have to be personalized but they can be.
+The text can contain the following tags which are replaced by the appropriate
+information when the file is read in:
+
+    |AUTHORREF|
+    |AUTHOR|
+    |COPYRIGHTHOLDER|
+    |EMAIL|
+    |PROJECT|
+		
+    |DATE|
+    |FILENAME|
+    |TIME|
+    |YEAR|
+
+    |CURSOR|
+
+Each tag can occur more than once. The tag |CURSOR| may appear only once.
+The tag |CURSOR| will be the cursor position after the block is read in.
+
+There is no need to use any of these tags, some or all can be missing.
+The template files can actually be links pointing to existing templates.
+
+
+==============================================================================
+CODE SNIPPETS                                       *nqcsupport-code-snippets*
+==============================================================================
+
+Code snippets are pieces of code which are kept in separate files in a special
+directory (e.g. a few lines of code or a complete template for a Makefile).
+File names are used to identify the snippets.  The snippet directory has to be
+created by the user ( $HOME/.vim/codesnippets-nqc is the default).
+Snippets are managed with the 3 entries 
+
+   NQC -> Snippets -> read  code snippet
+   NQC -> Snippets -> write code snippet
+   NQC -> Snippets -> edit  code snippet
+
+from the Snippets submenu.
+
+Creating a new snippet:  
+-----------------------
+When nothing is marked, "write code snippet" will write the whole buffer 
+to a snippet file, otherwise the marked area will be written to a file.
+
+Insert a snippet:
+-----------------
+Select the appropriate file from the snippet directory ("read  code snippet").
+The inserted lines will be indented.
+
+
+
+==============================================================================
+Release Notes                                       *nqcsupport-release-notes*
+==============================================================================
+
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 3.0
+------------------------------------------------------------------------------
+ + Only one NQC root menu entry in the gVim root menu.
+ + A marked region can be surrounded by a for-, if, if-else, while-,
+   do-while-statement (with indentation).
+ + 3 block comments are now read as templates or skeletons from files
+ + The NQC root menu can be changed or disabled.
+ + All hotkeys are only defined for NQC files (file type plugin added).
+ + Install script added.
+ + Customization improved.
+ + Documentation improved (help file added).
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 2.0
+------------------------------------------------------------------------------
+ + indentation: multiline inserts and code snippets will be indented after 
+   insertion.
+ + Most menu entries are now also active in normal mode.
+ + Code cleanup: register z no longer used. Most function calls are silent now.
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.9
+------------------------------------------------------------------------------
+ - maintain your own code snippets in a separate directory
+ - additional for- and if-statements
+ - new hotkey (save, open file, save buffer and compile)
+ - analyse datalog with GNUPLOT
+   + upload datalog in a separate buffer
+   + show x- or x-y-plot 
+   + configure plot (type: impulses, lines, lines+points, points, steps)
+   + set plot title
+   + save plot (Postscript) or print plot
+ - make hardcopy of buffer or of a highlighted part (Postscript)
+ - show settings (target, serial port, firmware, hotkeys) 
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.6.3
+------------------------------------------------------------------------------
+ - menus can now be toggled (look for an entry in the Tools menu)
+ - additional NQC-statements:  break unti continue start
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.5
+------------------------------------------------------------------------------
+ - API for NQC Vers. 2.3r1 complete 
+ - configurability improved 
+ - minor bugfixes and improvements
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.4
+------------------------------------------------------------------------------
+ - support for RCX, RCX2, CyberMaster, Scout
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.3.1
+------------------------------------------------------------------------------
+ - bug fix: datalog upload
+------------------------------------------------------------------------------
+  RELEASE NOTES FOR VERSION 1.3
+------------------------------------------------------------------------------
+ - Initial upload
+
+==============================================================================
+vim:tw=78:noet:ts=2:ft=help:norl:
