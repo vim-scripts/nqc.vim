@@ -2,63 +2,84 @@
 "
 "     Filename:  nqc.vim
 "
-"  Description:  gvim-menus for NQC (Not Quite C),  Version 2.3r1 .
+"  Description:  gvim-menus for NQC (Not Quite C),  Version 2.3r1 or newer.
 "
-"                NQC stands for Not Quite C, and is a simple language for programmimg
+"                NQC stands for Not Quite C, and is a C-like language for programmimg
 "                several LEGO MINDSTORMS products:  RCX, CyberMaster, Scout and RCX2.
 "                The language is described in:
 "                  NQC Programmers's Guide, Version 2.3r1, by Dave Baum
-"                  ( http://www.enteract.com/~dbaum/ )
+"                  ( http://www.baumfamily.org/nqc/ )
 "
 "                nqc.vim turns gvim into an IDE for NQC programming:
-"                 - insertion of NQC statements, API function calls, API constants and comments
-"                 - download and start programs
-"                 - download firmware
-"                 - upload the RCX datalog into the current buffer
-"                 - erase programs and datalogs
-"                 - configurable for RCX, RCX2, CyberMaster, Scout
 "
-"      Version:  1.6.3 - LINUX / UNIX
-"     Revision:  02.01.2002
+"    Features:   - insert various types of comments
+"                - insert complete but empty statements (e.g. 'if {} else {}' )
+"                - insert often used code snippets (e.g. function definition, #ifndef #def #endif, ... )
+"                - insert API-constants and calls for API-functions
+"                - read, write, maintain your own code snippets in a separate directory
+"                - download and start programs
+"                - download firmware
+"                - upload the RCX datalog into a new buffer
+"                - show or print datalog plot (gnuplot)
+"                - erase programs and datalogs
+"                - configurable for RCX, RCX2, CyberMaster, Scout
+"
 "       Author:  Dr.-Ing. Fritz Mehner
-"        Email:  mehner@mfh-iserlohn.de
-"      Created:  28.07.2001
+"        Email:  mehner@fh-swh.de
 "
-"        Usage:  (1.0) Configure  nqc.vim  (section Configuration below).
+"        Usage:  (1  ) Configure  nqc.vim 
+"                      There are some technical and personal details which should be configured
+"                      (see section Configuration  below; use my configuration as an example).
 "
 "                (2.1) Load  nqc.vim  manually into VIM with the 'so' command:
-"                      :so ~/<any directory>/nqc.vim
+"                      :so <any directory>/nqc.vim
 "
 "                      or better
-"                (2.2) Load nqc.vim on startup (VIM versions below 6) :
-"                      - Rename  nqc.vim  to  .nqc.vim  and move it to your home directory.
-"                      - place the following command in your file .gvimrc :
-"                        :so ~/.nqc.vim
-"                      or
-"                (2.3) Load nqc.vim on startup (VIM version 6.0 and higher) :
+"
+"                (2.2) Load nqc.vim on startup (VIM version 6.0 and higher) :
 "                      - move this file to the directory ~/.vim/plugin/
 "                
-"                You will find the menu entry "Load NQC extensions" in the Tools memu.
-"                The menu entry changes now to "Unload NQC extensions" .
+"                You will find the menu entry "Load NQC Support" in the Tools menu.
+"                After loading the menus this menu entry changes to "Unload NQC Support".
 "  
-"        Hints:  The register z is used in many places.
+"         Note:  The register z is used in many places.
 "
+let s:NQC_Version = "1.9"              " version number of this script; do not change
+
+"     Revision:  07.02.2003
+"     
+"      Created:  23.10.2002
+"
+"    Copyright:  Copyright (C) 2002-2003 Dr.-Ing. Fritz Mehner  (mehner@fh-swf.de)
+"
+"                This program is free software; you can redistribute it and/or modify
+"                it under the terms of the GNU General Public License as published by
+"                the Free Software Foundation; either version 2 of the License, or
+"                (at your option) any later version.
+"
+"                This program is distributed in the hope that it will be useful,
+"                but WITHOUT ANY WARRANTY; without even the implied warranty of
+"                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+"                GNU General Public License for more details.
+"
+"                You should have received a copy of the GNU General Public License
+"                along with this program; if not, write to the Free Software
+"                Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+"  
 "###############################################################################################
+"               
 "               Configuration     (Use my configuration as an example)
+"
 "-----------------------------------------------------------------------------------------------
 "
 "  Personalization  (full name, email, ... ; used in comments) :
 "
-let NQC_AuthorName      = "Fritz Mehner"
-let NQC_AuthorRef       = "Mn"
-"
-" ---------------------------------------------------------------------
+let s:NQC_AuthorName     = "Fritz Mehner"
+let s:NQC_AuthorRef      = "Mn"
 "
 "  RCX-Firmware (RCX 1.5, RCX 2.0, ... ); full path and filename :
 "
-let NQC_RCX_Firmware    = "~/bin/firm0328.lgo"
-"
-" ---------------------------------------------------------------------
+let NQC_RCX_Firmware     = $HOME."/bin/firm0328.lgo"
 "
 "  Choose a target :
 "
@@ -67,19 +88,60 @@ let NQC_RCX_Firmware    = "~/bin/firm0328.lgo"
 "    Scout :  Scout
 "    CM    :  Cybermaster
 "
-let NQC_Target     =  "RCX2"
-"
-" ---------------------------------------------------------------------
+let NQC_Target           = "RCX2"
 "
 "  Specify serial port, case matters (file permission 777) :
 "  /dev/ttyS0  =  COM1
 "  /dev/ttyS1  =  COM2
 "
-let NQC_Portname   =  "/dev/ttyS0"
+let NQC_Portname         = "/dev/ttyS0"
 "
+"
+let s:NQC_ShowMenues     = "no"							" show menues immediately after loading (yes/no)
+"                                           
+"
+let s:NQC_Printer        = "lpr"						" printer command
+"                                           
+"
+" The menu entries for code snippet support will not appear 
+" if the following string is empty 
+
+let s:NQC_CodeSnippets   = $HOME."/.vim/codesnippets-nqc"   " NQC code snippets
+"                                       
+let	s:Tools_menu_name    = "Tools"          " this variable contains the name of the Tools-menu
+                                            " if the original VIM-menus are translated;
+												    		            " for german menus : "Werkzeuge"
+"
+"-----------------------------------------------------------------------------------------------
+"  End of Configuration Section 
 "###############################################################################################
 "
 function!	NQC_InitMenu ()
+"
+"===============================================================================================
+"----- Menu : Key Mappings ---------------------------------------------------------------------
+"===============================================================================================
+"  The following key mappings are for convenience only. 
+"  Comment out the mappings if you dislike them.
+"  If enabled, there may be conflicts with predefined key bindings of your window manager.
+"-----------------------------------------------------------------------------------------------
+"       F2   update/save file without confirmation
+"       F3   file open dialog
+"       F9   save and compile 
+"
+noremap  <F2>    :update<CR>
+noremap  <F3>    :browse confirm e<CR>
+noremap  <F9>    :call NQC_SaveCompile()<CR>
+"
+inoremap  <F2>    <Esc>:update<CR>
+inoremap  <F3>    <Esc>:browse confirm e<CR>
+inoremap  <F9>    <Esc>:call NQC_SaveCompile()<CR>
+"
+"
+"----- for developement only -------------------------------------------------------------------
+"
+   noremap   <F12>       :write<CR><Esc>:so %<CR><Esc>:call NQC_Handle()<CR><Esc>:call NQC_Handle()<CR><Esc>:call NQC_Handle()<CR>
+  inoremap   <F12>  <Esc>:write<CR><Esc>:so %<CR><Esc>:call NQC_Handle()<CR><Esc>:call NQC_Handle()<CR><Esc>:call NQC_Handle()<CR>
 "
 "===============================================================================================
 "----- Menu : NQC-Comments ---------------------------------------------------------------------
@@ -97,17 +159,17 @@ function!	NQC_InitMenu ()
 "  uncomment   a highlighted block of code
 "===============================================================================================
 "
-imenu  NQC-&Comments.&Line\ End\ Comment               <Tab><Tab><Tab>// 
-imenu  NQC-&Comments.&Frame\ Comment                   <Esc>:call NQC_CommentFrame()          <CR>jA
-imenu  NQC-&Comments.task\/function\/sub\ &Description <Esc>:call NQC_CommentFunction()       <CR>:/Name<CR>A
-imenu  NQC-&Comments.File\ &Prologue                   <Esc>:call NQC_CommentFilePrologue()   <CR>:/Description<CR>A
-imenu  NQC-&Comments.-SEP1-                            :
-imenu  NQC-&Comments.\/\/\ Date\ Time\ &Author         <Esc>$<Esc>:call NQC_CommentDateTimeAuthor() <CR>kJA
-imenu  NQC-&Comments.Date\ &Time                       <Esc>:call NQC_CommentDateTime()             <CR>kJi
-imenu  NQC-&Comments.Date                              <Esc>:call NQC_CommentDate()                 <CR>kJi
-imenu  NQC-&Comments.-SEP2-                            :
-vmenu  NQC-&Comments.&code->comment                    <Esc>:'<,'>s/^/\/\//<CR>
-vmenu  NQC-&Comments.c&omment->code                    <Esc>:'<,'>s/^\/\///<CR>
+amenu  NQC-&Comments.&Line\ End\ Comment               <Esc><Esc>A<Tab><Tab><Tab>// 
+amenu  NQC-&Comments.&Frame\ Comment                   <Esc><Esc>:call NQC_CommentFrame()          <CR>jA
+amenu  NQC-&Comments.task\/function\/sub\ &Description <Esc><Esc>:call NQC_CommentFunction()       <CR>:/NAME<CR>A
+amenu  NQC-&Comments.File\ &Prologue                   <Esc><Esc>:call NQC_CommentFilePrologue()   <CR>:/DESCRIPTION<CR>A
+amenu  NQC-&Comments.-SEP1-                            :
+amenu  NQC-&Comments.\/\/\ Date\ Time\ &Author         <Esc><Esc>$<Esc>:call NQC_CommentDateTimeAuthor() <CR>kJA
+vmenu  NQC-&Comments.&code->comment                    <Esc><Esc>:'<,'>s/^/\/\//<CR><Esc>:nohlsearch<CR>
+vmenu  NQC-&Comments.c&omment->code                    <Esc><Esc>:'<,'>s/^\/\///<CR><Esc>:nohlsearch<CR>
+amenu  NQC-&Comments.-SEP2-                            :
+amenu  NQC-&Comments.&Date                             <Esc><Esc>:let @z=strftime("%x")     <CR>"zpa
+amenu  NQC-&Comments.Date\ &Time                       <Esc><Esc>:let @z=strftime("%x - %X")<CR>"zpa
 "
 "===============================================================================================
 "----- Menu : NQC-Statements -------------------------------------------------------------------
@@ -115,32 +177,43 @@ vmenu  NQC-&Comments.c&omment->code                    <Esc>:'<,'>s/^\/\///<CR>
 "      Inserting at the end of a line preserves indentation.
 "-----------------------------------------------------------------------------------------------
 "
-imenu  NQC-St&atements.&if\ \{\ \}                 <Esc>:let @z="if (  )\n{\n\t\n}\n"                 <CR>"z]p<Esc>f(la
-imenu  NQC-St&atements.if\ \{\ \}\ &else\ \{\ \}   <Esc>:let @z="if (  )\n{\n\t\n}\nelse\n{\n\t\n}\n" <CR>"z]p<Esc>f(la
-imenu  NQC-St&atements.&for\ \{\ \}                <Esc>:let @z="for ( ; ;  )\n{\n\t\n}\n"            <CR>"z]p<Esc>f;i
+imenu  NQC-St&atements.&if                         <Esc>:let @z="if (  )\n\t\n"                       <CR>"z]p<Esc>f(la
+imenu  NQC-St&atements.if\ &else                   <Esc>:let @z="if (  )\n\t\nelse\n\t\n"             <CR>"z]p<Esc>f(la
+imenu  NQC-St&atements.i&f\ \{\ \}                 <Esc>:let @z="if (  )\n{\n\t\n}\n"                 <CR>"z]p<Esc>f(la
+imenu  NQC-St&atements.if\ \{\ \}\ e&lse\ \{\ \}   <Esc>:let @z="if (  )\n{\n\t\n}\nelse\n{\n\t\n}\n" <CR>"z]p<Esc>f(la
+imenu  NQC-St&atements.f&or                        <Esc>:let @z="for ( ; ;  )\n"                      <CR>"z]p<Esc>f;i
+imenu  NQC-St&atements.fo&r\ \{\ \}                <Esc>:let @z="for ( ; ;  )\n{\n\t\n}\n"            <CR>"z]p<Esc>f;i
+"	
 imenu  NQC-St&atements.&while\ \{\ \}              <Esc>:let @z="while (  )\n{\n\t\n}\n"              <CR>"z]p<Esc>f(la
 imenu  NQC-St&atements.&do\ \{\ \}\ while          <Esc>:call NQC_DoWhile()                           <CR>"z]p<Esc>:/while <CR>f(la
-imenu  NQC-St&atements.&repeat\ \{\ \}             <Esc>:let @z="repeat (  )\n{\n\t\n}\n"             <CR>"z]p<Esc>f(la
+imenu  NQC-St&atements.re&peat\ \{\ \}             <Esc>:let @z="repeat (  )\n{\n\t\n}\n"             <CR>"z]p<Esc>f(la
 imenu  NQC-St&atements.&until                      <Esc>:let @z="until (  );\n"                       <CR>"z]p<Esc>f(la
 imenu  NQC-St&atements.&switch                     <Esc>:call NQC_CodeSwitch()                        <CR>"z]p<Esc>f(la
 imenu  NQC-St&atements.&case                       <Esc>:call NQC_CodeCase()                          <CR>"z]p<Esc>f:i
 imenu  NQC-St&atements.brea&k                      <Esc>:let @z="break;\n"                            <CR>"z]p<Esc>A
-imenu  NQC-St&atements.c&ontinue                   <Esc>:let @z="continue;\n"                         <CR>"z]p<Esc>A
+imenu  NQC-St&atements.continue                    <Esc>:let @z="continue;\n"                         <CR>"z]p<Esc>A
 imenu  NQC-St&atements.st&art                      <Esc>:let @z="start\t;\n"                          <CR>"z]p<Esc>f;i
 imenu  NQC-St&atements.-SEP1-                      :
 imenu  NQC-St&atements.&task                       <Esc>:call NQC_CodeTask()<CR>
-imenu  NQC-St&atements.in&line\ function           <Esc>:call NQC_CodeInlineFunction()<CR>
+imenu  NQC-St&atements.function                    <Esc>:call NQC_CodeInlineFunction()<CR>
 imenu  NQC-St&atements.su&broutine                 <Esc>:call NQC_CodeSubroutine()<CR>
 imenu  NQC-St&atements.-SEP2-                      :
 imenu  NQC-St&atements.#include\ \"\.\.\.\"        <Esc>:let @z="#include\t\".nqh\""                          <CR>"zp<Esc>F.i
 imenu  NQC-St&atements.&#define                    <Esc>:let @z="#define\t\t\t\t// "                          <CR>"zp<Esc>4F<Tab>a
-imenu  NQC-St&atements.#if&ndef\.\.#def\.\.#endif  <Esc>:call NQC_CodeIfndef()<CR>
+imenu  NQC-St&atements.#ifndef\.\.#def\.\.#endif   <Esc>:call NQC_CodeIfndef()<CR>
 imenu  NQC-St&atements.#ifdef\.\.#endif            #ifdef<Tab><CR><CR><CR>#endif<Esc>3kA
 if g:NQC_Target=="RCX2" || g:NQC_Target=="Scout"
   imenu  NQC-St&atements.-SEP3-                      :
   imenu  NQC-St&atements.ac&quire                    <Esc>:call NQC_Acquire()<CR>f(a
   imenu  NQC-St&atements.&monitor                    <Esc>:call NQC_Monitor()<CR>f(a
-  imenu  NQC-St&atements.&catch\ \(\ \)              <Esc>:call NQC_Catch()<CR>f(a
+  imenu  NQC-St&atements.catc&h\ \(\ \)              <Esc>:call NQC_Catch()<CR>f(a
+endif
+if s:NQC_CodeSnippets != ""
+	imenu NQC-St&atements.-SEP6-                         :
+	amenu  NQC-St&atements.read\ code\ snippet        <C-C>:call NQC_CodeSnippet("r")<CR>
+	amenu  NQC-St&atements.write\ code\ snippet       <C-C>:call NQC_CodeSnippet("w")<CR>
+	vmenu  NQC-St&atements.write\ code\ snippet       <C-C>:call NQC_CodeSnippet("wv")<CR>
+	amenu  NQC-St&atements.edit\ code\ snippet        <C-C>:call NQC_CodeSnippet("e")<CR>
 endif
 "
 "===============================================================================================
@@ -482,17 +555,36 @@ endif
 "
 "
 "===============================================================================================
+"----- Menu : Datalog  -------------------------------------------------------------------------
+"===============================================================================================
+"
+  amenu  &Datalog.&upload\ datalog\ into\ buffer             <C-C>:call NQC_DatalogUpload()<CR>
+  amenu  &Datalog.-SEP1-                                     :
+  amenu  &Datalog.show\ y-&plot\                             <C-C>:call NQC_DatalogPlot(1)<CR>
+  amenu  &Datalog.show\ &x-y-plot\                           <C-C>:call NQC_DatalogPlot(2)<CR>
+  amenu  &Datalog.&save\ plot\ (<filenam>\.ps)               <C-C>:call NQC_DatalogPlot(10)<CR>
+  amenu  &Datalog.p&rint\ plot\                              <C-C>:call NQC_DatalogPlot(11)<CR>
+  amenu  &Datalog.plot\ &type.&impulses                      <C-C>:call NQC_DatalogPlotType("impulses")<CR>
+  amenu  &Datalog.plot\ &type.&lines                         <C-C>:call NQC_DatalogPlotType("lines")<CR>
+  amenu  &Datalog.plot\ &type.l&ines+points                  <C-C>:call NQC_DatalogPlotType("linespoints")<CR>
+  amenu  &Datalog.plot\ &type.&points                        <C-C>:call NQC_DatalogPlotType("points")<CR>
+  amenu  &Datalog.plot\ &type.&steps                         <C-C>:call NQC_DatalogPlotType("steps")<CR>
+  amenu  &Datalog.plot\ t&itle                               <C-C>:call NQC_DatalogPlotTitle()<CR>
+  amenu  &Datalog.-SEP2-                                     :
+  amenu  &Datalog.&erase\ programs\ and\ datalogs\ from\ RCX <C-C>:call NQC_DatalogClear()<CR>
+"
+"===============================================================================================
 "----- Menu : NQC-Run  -------------------------------------------------------------------------
 "===============================================================================================
 "
-amenu  NQC-&Run.save\ and\ &compile                         <C-C>:call NQC_SaveCompile ()<CR>
+amenu  NQC-&Run.save\ and\ &compile\ \<F9\>                 <C-C>:call NQC_SaveCompile ()<CR>
 amenu  NQC-&Run.-SEP1-                                      :
 if g:NQC_Target=="RCX" ||  g:NQC_Target=="RCX2"
-  amenu  NQC-&Run.download\ program\ 1\ to\ RCX             <C-C>:call NQC_CompDown (1)<CR>
-  amenu  NQC-&Run.download\ program\ 2\ to\ RCX             <C-C>:call NQC_CompDown (2)<CR>
-  amenu  NQC-&Run.download\ program\ 3\ to\ RCX             <C-C>:call NQC_CompDown (3)<CR>
-  amenu  NQC-&Run.download\ program\ 4\ to\ RCX             <C-C>:call NQC_CompDown (4)<CR>
-  amenu  NQC-&Run.download\ program\ 5\ to\ RCX             <C-C>:call NQC_CompDown (5)<CR>
+  amenu  NQC-&Run.download\ program\ &1\ to\ RCX             <C-C>:call NQC_CompDown (1)<CR>
+  amenu  NQC-&Run.download\ program\ &2\ to\ RCX             <C-C>:call NQC_CompDown (2)<CR>
+  amenu  NQC-&Run.download\ program\ &3\ to\ RCX             <C-C>:call NQC_CompDown (3)<CR>
+  amenu  NQC-&Run.download\ program\ &4\ to\ RCX             <C-C>:call NQC_CompDown (4)<CR>
+  amenu  NQC-&Run.download\ program\ &5\ to\ RCX             <C-C>:call NQC_CompDown (5)<CR>
   amenu  NQC-&Run.-SEP2-                                    :
   amenu  NQC-&Run.download\ program\ 1\ to\ RCX\ and\ Run   <C-C>:call NQC_CompDownRun (1)<CR>
   amenu  NQC-&Run.download\ program\ 2\ to\ RCX\ and\ Run   <C-C>:call NQC_CompDownRun (2)<CR>
@@ -500,16 +592,24 @@ if g:NQC_Target=="RCX" ||  g:NQC_Target=="RCX2"
   amenu  NQC-&Run.download\ program\ 4\ to\ RCX\ and\ Run   <C-C>:call NQC_CompDownRun (4)<CR>
   amenu  NQC-&Run.download\ program\ 5\ to\ RCX\ and\ Run   <C-C>:call NQC_CompDownRun (5)<CR>
   amenu  NQC-&Run.-SEP3-                                    :
-  amenu  NQC-&Run.download\ firmware\ to\ RCX               <C-C>:call NQC_DLoadFirmware()<CR>
-  amenu  NQC-&Run.upload\ datalog\ into\ buffer             <C-C>:call NQC_DatalogUpload()<CR>
-  amenu  NQC-&Run.erase\ programs\ and\ datalogs\ from\ RCX <C-C>:call NQC_DatalogClear()<CR>
+  amenu  NQC-&Run.&run\ current\ program                     <C-C>:call NQC_RunCurrent ()<CR>
+	imenu  NQC-&Run.-SEP4-                                    :
+	amenu  NQC-&Run.&hardcopy\ buffer\ to\ FILENAME\.ps       <C-C>:call Hardcopy("n")<CR>
+	vmenu  NQC-&Run.hard&copy\ highlighted\ part\ to\ FILENAME\.part\.ps   <C-C>:call Hardcopy("v")<CR>
+  amenu  NQC-&Run.-SEP5-                                    :
+  amenu  NQC-&Run.&erase\ programs\ and\ datalogs\ from\ RCX <C-C>:call NQC_DatalogClear()<CR>
+  amenu  NQC-&Run.download\ &firmware\ to\ RCX               <C-C>:call NQC_DLoadFirmware("normal")<CR>
 endif
 if g:NQC_Target=="Scout"
-  amenu  NQC-&Run.download\ program\ to\ Scout              <C-C>call NQC_CompDownRun(0)<CR>
+  amenu  NQC-&Run.&download\ program\ to\ Scout              <C-C>call NQC_CompDownRun(0)<CR>
 endif
 if g:NQC_Target=="CM"
-  amenu  NQC-&Run.download\ program\ to\ CyberMaster        <C-C>call NQC_CompDownRun(0)<CR>
+  amenu  NQC-&Run.&download\ program\ to\ CyberMaster        <C-C>call NQC_CompDownRun(0)<CR>
 endif
+	imenu  NQC-&Run.-SEP6-                                :
+	amenu  NQC-&Run.&settings                                  <C-C>:call NQC_Settings()<CR>
+
+	amenu  NQC-&Run.&about\ nqc\.vim                           <C-C>:call NQC_Version()<CR>
 "
 endfunction			" function NQC_InitMenu
 "
@@ -533,9 +633,9 @@ endfunction
 function! NQC_CommentFunction ()
   let @z=    "//=====================================================================================\n"
   let @z= @z."//\n"
-  let @z= @z."//        Name:  \n"
+  let @z= @z."//        NAME:  \n"
   let @z= @z."//\n"
-  let @z= @z."// Description:  \n"
+  let @z= @z."// DESCRIPTION:  \n"
   let @z= @z."//\n"
   let @z= @z."//- PARAMETER -------------------------------------------------------------------------\n"
   let @z= @z."//     Mode   Type            Name            Description\n"
@@ -544,8 +644,8 @@ function! NQC_CommentFunction ()
   let @z= @z."//   in-out:  \n"
   let @z= @z."//      out:  \n"
   let @z= @z."//-------------------------------------------------------------------------------------\n"
-  let @z= @z."//   Author:  ".g:NQC_AuthorName."\n"
-  let @z= @z."//     Date:  ".strftime("%x - %X")."\n"
+  let @z= @z."//   AUTHOR:  ".s:NQC_AuthorName."\n"
+  let @z= @z."//  CREATED:  ".strftime("%x - %X")."\n"
   let @z= @z."//=====================================================================================\n"
   put z
 endfunction
@@ -558,12 +658,12 @@ function! NQC_CommentFilePrologue ()
     let File = expand("%:t")                  " name of the file in the current buffer
     let @z=    "//=====================================================================================\n"
     let @z= @z."//\n"
-    let @z= @z."//       Filename:\t".File."\n"
-    let @z= @z."//    Description:\t\n"
+    let @z= @z."//       FILENAME:\t".File."\n"
+    let @z= @z."//    DESCRIPTION:\t\n"
     let @z= @z."//\n"
-    let @z= @z."//       Compiler:\tnqc\n"
-    let @z= @z."//         Author:\t".g:NQC_AuthorName."\n"
-    let @z= @z."//        Created:\t".strftime("%x - %X")."\n"
+    let @z= @z."//       COMPILER:\tnqc\n"
+    let @z= @z."//         AUTHOR:\t".s:NQC_AuthorName."\n"
+    let @z= @z."//        CREATED:\t".strftime("%x - %X")."\n"
     let @z= @z."//=====================================================================================\n"
     put! z
 endfunction
@@ -574,15 +674,7 @@ endfunction
 "  NQC-Comments : Date
 "------------------------------------------------------------------------------
 function! NQC_CommentDateTimeAuthor ()
-  put = '//% '.strftime(\"%x - %X\").' ('.g:NQC_AuthorRef.')'
-endfunction
-"
-function! NQC_CommentDateTime ()
-  put = strftime(\"%x - %X\")
-endfunction
-"
-function! NQC_CommentDate ()
-  put = strftime(\"%x\")
+  put = '//% '.strftime(\"%x - %X\").' ('.s:NQC_AuthorRef.')'
 endfunction
 "
 "------------------------------------------------------------------------------
@@ -646,15 +738,15 @@ function! NQC_CodeTask ()
 endfunction
 "
 "------------------------------------------------------------------------------
-"  NQC-Statements : inline function
+"  NQC-Statements : function
 "------------------------------------------------------------------------------
 function! NQC_CodeInlineFunction ()
-  let identifier=inputdialog("inline function name", "func")
+  let identifier=inputdialog("function name", "func")
   if identifier==""
     let identifier = "func"
   endif
   let @z=    "void\n".identifier."\t(  )\n{\n\n\n\treturn ;\n}"
-  let @z= @z."\t\t\t\t// ----------  end of inline function ".identifier."  ----------"
+  let @z= @z."\t\t\t\t// ----------  end of function ".identifier."  ----------"
     put z
 endfunction
 "
@@ -702,6 +794,7 @@ endfunction
 "------------------------------------------------------------------------------
 "  NQC-Statements : compile, download
 "  NQC-Statements : compile, download and run
+"  NQC-Statements : run current program
 "------------------------------------------------------------------------------
 function! NQC_CompDown (n)
   let @z= "!nqc -T".g:NQC_Target." -S".g:NQC_Portname." -d -pgm ".a:n." %"
@@ -717,26 +810,233 @@ function! NQC_CompDownRun (n)
   exec @z
 endfunction
 "
+function! NQC_RunCurrent ()
+  if g:NQC_Target=="RCX" || g:NQC_Target=="RCX2"
+    let @z= "!nqc -T".g:NQC_Target." -S".g:NQC_Portname." -run"
+  endif
+  exec @z
+endfunction
+"
 "------------------------------------------------------------------------------
 "  NQC-Statements : download firmware
 "------------------------------------------------------------------------------
-function! NQC_DLoadFirmware ()
-  let @z= "!nqc  -S".g:NQC_Portname." -firmware ".g:NQC_RCX_Firmware
-  exec @z
+function! NQC_DLoadFirmware (n)
+	if a:n=="fast"
+		let @z= "!nqc  -S".g:NQC_Portname." -near -firmfast ".g:NQC_RCX_Firmware
+	else
+		let @z= "!nqc  -S".g:NQC_Portname." -firmware ".g:NQC_RCX_Firmware
+	endif
+	exec @z
 endfunction
 "
 "------------------------------------------------------------------------------
-"  NQC-Statements : datalog upload / clear
+"  Datalog : variables
+"------------------------------------------------------------------------------
+let s:NQC_Plot_Type				= "steps"						" Gnuplot style parameter
+let s:NQC_Plot_Dataformat	= "x"								" x-plot / x-y-plot
+let s:NQC_Plot_Title			= "RCX-Datalog"			" Gnuplot title
+
+"------------------------------------------------------------------------------
+"  Datalog : set plot style
+"------------------------------------------------------------------------------
+function! NQC_DatalogPlotType(type)
+	let s:NQC_Plot_Type=a:type
+endfunction
+"
+"------------------------------------------------------------------------------
+"  Datalog : set plot title
+"------------------------------------------------------------------------------
+function! NQC_DatalogPlotTitle()
+	let s:NQC_Plot_Title	= inputdialog("Plot Title",  s:NQC_Plot_Title )
+endfunction
+
+"------------------------------------------------------------------------------
+"  Datalog : datalog upload 
+"  1. line initially empty; will be deleted
 "------------------------------------------------------------------------------
 function! NQC_DatalogUpload ()
-  put = '// -----  datalog : '.strftime(\"%x - %X\").'  -----'
-  let @z= "read !nqc -S".g:NQC_Portname." -datalog 2>/dev/null"
-  exec @z
+
+	let	filename=browse(0,"open a new datalaog file", ".", "datalog" )
+	if filename != ""
+
+		if filereadable(filename)
+			exe ":!rm ".filename."  2>/dev/null"  
+		endif
+
+		exe ":25vnew ".filename
+		exe ":read !nqc -S".g:NQC_Portname." -datalog 2>/dev/null"
+		set noswapfile
+		exe ":1,1d"
+
+	endif
+
 endfunction
 "
+"------------------------------------------------------------------------------
+"  Datalog : datalog plot
+"  n =  1 : show plot      (gnuplot, terminal X11)
+"  n =  2 : show x-y-plot  (gnuplot, terminal X11)
+"  n = 10 : make hardcopy  (gnuplot, terminal postscript)
+"  n = 11 : print plot     (gnuplot, terminal postscript)
+"------------------------------------------------------------------------------
+function! NQC_DatalogPlot (n)
+
+	if system("which gnuplot 2>/dev/null")==""
+		echo "**  program gnuplot is not available  **"
+		return
+	endif
+
+	let	Sou				= expand("%:p")					" name of the file in the current buffer
+	let	tempfile	= tempname()
+	let	timestamp	= Sou.'  *  '.strftime("%x - %X").'  *  '.s:NQC_AuthorName
+	:execute  "silent :!echo \"set grid \" > ".tempfile
+	if a:n==10 || a:n==11
+		:execute  "silent :!echo \"set terminal postscript\" >> ".tempfile
+	endif
+	:execute  "silent:!echo \"set nokey \" >> ".tempfile
+	:execute  "silent:!echo \"set timestamp \'".timestamp."\'\" >> ".tempfile
+	:execute  "silent:!echo \"set title \'".s:NQC_Plot_Title."\'\" >> ".tempfile
+	:execute  "silent:!echo \"plot '-' with ".s:NQC_Plot_Type."\" >> ".tempfile
+	"
+	"---------- y-plot ------------------------------------------
+	if a:n==1
+		let s:NQC_Plot_Dataformat	= "x"
+		:execute  "silent:!cat % >> ".tempfile
+		:execute  "silent:!gnuplot -persist ".tempfile." &"
+		:echo "**  quit gnuplot with 'q'  **"
+	endif
+	"
+	"---------- x-y-plot ----------------------------------------
+	if a:n==2
+		let s:NQC_Plot_Dataformat	= "xy"
+		:%s/\(.\+\)\n\(.\+\)/\1 \2/								 " group 2 lines in a x-y-pair
+		:execute  "silent:!cat % >> ".tempfile
+		:u
+		:execute  "silent:!gnuplot -persist ".tempfile." &"
+		:echo "**  quit gnuplot with 'q'  **"
+	endif
+	"
+	"---------- generate postscript -----------------------------
+	if a:n==10
+		if s:NQC_Plot_Dataformat=="xy"
+			:%s/\(.\+\)\n\(.\+\)/\1 \2/								 " group 2 lines in a x-y-pair
+		endif
+		:execute  "silent:!cat % >> ".tempfile
+		:execute  "silent:!gnuplot  ".tempfile." > ".Sou.".ps &"
+		if s:NQC_Plot_Dataformat=="xy"
+			:u
+		endif
+	endif
+	"
+	"---------- print postscript --------------------------------
+	if a:n==11
+		if s:NQC_Plot_Dataformat=="xy"
+			:%s/\(.\+\)\n\(.\+\)/\1 \2/								 " group 2 lines in a x-y-pair
+		endif
+		:execute  "silent:!cat % >> ".tempfile
+		:execute  "silent:!gnuplot  ".tempfile." | ".s:NQC_Printer." &"
+		if s:NQC_Plot_Dataformat=="xy"
+			:u
+		endif
+	endif
+
+endfunction
+"
+"------------------------------------------------------------------------------
+"  Datalog : erase programs / clear datalog 
+"------------------------------------------------------------------------------
 function! NQC_DatalogClear ()
   let @z= "!nqc -S".g:NQC_Portname." -clear"
   exec @z
+endfunction
+"
+"
+"------------------------------------------------------------------------------
+"  NQC-Statements : read / edit code snippet
+"------------------------------------------------------------------------------
+function! NQC_CodeSnippet(arg1)
+	if isdirectory(s:NQC_CodeSnippets)
+		"
+		" read snippet file, put content below current line
+		" 
+		if a:arg1 == "r"
+			let	l:snippetfile=browse(0,"read a code snippet",s:NQC_CodeSnippets,"")
+			if l:snippetfile != ""
+				:execute "read ".l:snippetfile
+			endif
+		endif
+		"
+		" update current buffer / split window / edit snippet file
+		" 
+		if a:arg1 == "e"
+			let	l:snippetfile=browse(0,"edit a code snippet",s:NQC_CodeSnippets,"")
+			if l:snippetfile != ""
+				:execute "update! | split | edit ".l:snippetfile
+			endif
+		endif
+		"
+		" write whole buffer into snippet file 
+		" 
+		if a:arg1 == "w"
+			let	l:snippetfile=browse(0,"write a code snippet",s:NQC_CodeSnippets,"")
+			if l:snippetfile != ""
+				:execute ":write! ".l:snippetfile
+			endif
+		endif
+		"
+		" write marked area into snippet file 
+		" 
+		if a:arg1 == "wv"
+			let	l:snippetfile=browse(0,"write a code snippet",s:NQC_CodeSnippets,"")
+			if l:snippetfile != ""
+				:execute ":*write! ".l:snippetfile
+			endif
+		endif
+
+	else
+		echohl ErrorMsg
+		echo "code snippet directory ".s:NQC_CodeSnippets." does not exist"
+		echohl None
+	endif
+endfunction
+"
+"------------------------------------------------------------------------------
+"  run : hardcopy
+"------------------------------------------------------------------------------
+function! Hardcopy (arg1)
+	let	Sou		= expand("%")								" name of the file in the current buffer
+	" ----- normal mode ----------------
+	if a:arg1=="n"
+		exe	"hardcopy > ".Sou.".ps"		
+	endif
+	" ----- visual mode ----------------
+	if a:arg1=="v"
+		exe	"*hardcopy > ".Sou.".part.ps"		
+	endif
+endfunction
+"
+"------------------------------------------------------------------------------
+"  run : settings
+"------------------------------------------------------------------------------
+function! NQC_Settings ()
+	let settings =          "nqc.vim settings:\n"
+	let settings = settings."\n"
+	let settings = settings."target :  ".g:NQC_Target."\n"
+	let settings = settings."serial port :  ".g:NQC_Portname."\n"
+	let settings = settings."firmware :  ".g:NQC_RCX_Firmware."\n"
+	let settings = settings."\nhot keys:        \n"
+	let settings = settings."F2  :  update (save) file      \n"
+	let settings = settings."F3  :  file open dialog        \n"
+  let settings = settings."F9  :  save and compile buffer\n"
+	let settings = settings."\nMake changes in file \"".expand("%:p")."\"\n"
+	let dummy=confirm( settings, "ok", 1, "Info" )
+endfunction
+"
+"------------------------------------------------------------------------------
+"  run : about
+"------------------------------------------------------------------------------
+function! NQC_Version ()
+	let dummy=confirm("NQC-Support, Version ".s:NQC_Version."\nDr. Fritz Mehner\nmehner@fh-swf.de", "ok" )
 endfunction
 "
 "------------------------------------------------------------------------------
@@ -747,17 +1047,19 @@ endfunction
 let s:NQC_Active = -1														" state variable controlling the NQC-menus
 "
 function! NQC_CreateUnLoadMenuEntries ()
-"
+	"
 	" NQC is now active and was former inactive -> 
 	" Insert Tools.Unload and remove Tools.Load Menu
+	" protect the following submenu names against interpolation by using single qoutes (Mn)
+	"
 	if  s:NQC_Active == 1
-		aunmenu Tools.Load\ NQC\ Extensions
-		amenu   &Tools.Unload\ NQC\ Extensions  	<C-C>:call NQC_Handle()<CR>
+		exe "aunmenu ".s:Tools_menu_name.'.Load\ NQC\ Support'
+		exe "amenu   &".s:Tools_menu_name.'.Unload\ NQC\ Support  	<C-C>:call NQC_Handle()<CR>'
 	else
 		" NQC is now inactive and was former active or in initial state -1 
 		if s:NQC_Active == 0
 			" Remove Tools.Unload if NQC was former inactive
-			aunmenu Tools.Unload\ NQC\ Extensions
+			exe "aunmenu ".s:Tools_menu_name.'.Unload\ NQC\ Support'
 		else
 			" Set initial state NQC_Active=-1 to inactive state NQC_Active=0
 			" This protects from removing Tools.Unload during initialization after
@@ -765,10 +1067,9 @@ function! NQC_CreateUnLoadMenuEntries ()
 			let s:NQC_Active = 0
 			" Insert Tools.Load
 		endif
-		amenu &Tools.Load\ NQC\ Extensions <C-C>:call NQC_Handle()<CR>
+		exe "amenu &".s:Tools_menu_name.'.Load\ NQC\ Support <C-C>:call NQC_Handle()<CR>'
 	endif
 	"
-"
 endfunction
 "
 "------------------------------------------------------------------------------
@@ -783,6 +1084,7 @@ function! NQC_Handle ()
 		aunmenu NQC-Statements
 		aunmenu API-Functions
 		aunmenu API-Constants
+		aunmenu Datalog
 		aunmenu NQC-Run
 		let s:NQC_Active = 0
 	endif
@@ -794,6 +1096,8 @@ endfunction
 " 
 call NQC_CreateUnLoadMenuEntries()			" create the menu entry in the GVIM tool menu
 "
-"call NQC_Handle()												" show menu 
+if s:NQC_ShowMenues == "yes"
+	call NQC_Handle()											" load the menus
+endif
 "
 "=====================================================================================
